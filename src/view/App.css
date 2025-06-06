@@ -1,0 +1,47 @@
+#app_root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: flex-start;
+}
+
+body {
+    padding: 0;
+    color: #d4d4d4;
+    font-family: "Segoe WPC", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    height: 100%;
+    scrollbar-color: rgba(121, 121, 121, 04)
+}
+
+textarea {
+    color: #d4d4d4;
+    background-color: rgb(30, 30, 30);
+    width: 98%;
+
+}
+
+#chat_container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    align-items: flex-start;
+}
+
+#chat_input_part {
+    margin-top: auto;
+    text-align: right;
+    width: 95%;
+}
+
+#chat_input_area {
+    height: 150px;
+    width: 100%;
+}
+
+#chat_input_button {
+    margin-left: auto;
+    margin-right: 0px;
+}

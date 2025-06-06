@@ -1,9 +1,17 @@
 import React from 'react';
-
+import "./App.css"
+import InputArea from './chat/InputArea';
+import ChatItem from './chat/ChatItem';
+import ChatContainer from './chat/ChatItemContainer';
 function App() {
   return (
-    <h2 color='#FFFFFF'>Webview-react1123                                                                                                                                                              
-    `                                                                                                                                                                                                                                                             1fsdf11</h2>
+    <div id="app_root">
+  
+      <ChatContainer></ChatContainer>
+   
+    </div>   
+
   );
 }
+
 export default App;

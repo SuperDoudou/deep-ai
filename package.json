@@ -12,6 +12,24 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "deep-ai-container",
+          "icon": "resources/deepAI.svg",
+          "title": "deep ai agent"
+        }
+      ]
+    },
+    "views": {
+      "deep-ai-container": [
+        {
+          "id": "deep-ai-view",
+          "type": "webview",
+          "name": "deep ai view"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "deep-ai.helloWorld",
@@ -46,12 +64,15 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
     "eslint": "^9.25.1",
     "html-webpack-plugin": "^5.6.3",
+    "style-loader": "^4.0.0",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.3",
     "webpack": "^5.99.7",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
     "react": "^19.1.0",
