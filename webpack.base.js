@@ -1,5 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { type } = require('os');
+const { use } = require('react');
 
 module.exports = {
   entry: path.join(__dirname, './src/view/index.tsx'), // 入口文件
@@ -29,11 +31,15 @@ module.exports = {
           'style-loader',
           'css-loader'
         ]
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/,
+        use: ['raw-loader'],
       }
     ]
   },
   resolve: {
-    extensions: ['.js', '.tsx', '.ts'],
+    extensions: ['.js', '.tsx', '.ts', '.css'],
   },
   plugins: [
     new HtmlWebpackPlugin({

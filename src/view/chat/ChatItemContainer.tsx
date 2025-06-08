@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import InputArea from './InputArea';
 import ChatItem from './ChatItem';
-
+import svg from '../../resources/robot.svg'
 type MessageItem = {
     name: string;
+    isRobot: boolean;
     avatar: string;
     message: string;
 };
@@ -12,42 +13,61 @@ function ChatContainer() {
 
     const [messagesList, setMessagesList] = useState<MessageItem[]>([])
 
+    useEffect(() => {
+        let randMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)]
+        pushMessagesList({
+            name: randMessage.name,
+            avatar: randMessage.avatar,
+            isRobot: true,
+            message: '你好，这是第一条消息'
+        })
+    }, [])
+
+    let pushMessagesList = (message: MessageItem) => {
+        // debugger
+        console.log(`push message ${message.message}`)
+        setMessagesList(messagesList => {
+            let temp = [...messagesList]
+            temp.push(message)
+            return temp
+        })
+    };
+
+    let svgToDataURL = (svgString: string) => {
+        return "data:image/svg+xml," + encodeURIComponent(svg);
+    }
 
     const onInputMessage = (message: string) => {
         console.log(`get input message ${message}`)
-        let temp = [...messagesList]
-        temp.push({ name: mockUser.name, avatar: mockUser.avatar, message: message })
-        setMessagesList(temp)
+        pushMessagesList({
+            name: mockUser.name,
+            isRobot: false,
+            avatar: mockUser.avatar,
+            message: message
+        })
 
         setTimeout(() => {
-            temp = [...messagesList]
             let randMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)]
-            temp.push(randMessage)
-            setMessagesList(temp)
+            pushMessagesList(randMessage)
+
         }, 2000);
     }
 
-    const mockUser = { name: 'mockUser', avatar: '/user_avatar1.png' }
+    const mockUser = { name: '企鵝豆豆', avatar: svgToDataURL(svg) }
 
 
     const mockMessages: MessageItem[] = [
-        { name: '用户1', avatar: '/avatar1.png', message: '你好，这是第一条消息' },
-        { name: '用户2', avatar: '/avatar2.png', message: '今天的会议安排如何？' },
-        { name: '用户3', avatar: '/avatar3.png', message: '请查看最新文档' },
-        { name: '用户4', avatar: '/avatar4.png', message: '项目进度更新' },
-        { name: '用户5', avatar: '/avatar5.png', message: '需要技术支持' },
-        { name: '用户6', avatar: '/avatar6.png', message: '设计稿已提交' },
-        { name: '用户7', avatar: '/avatar7.png', message: '服务器状态正常' },
-        { name: '用户8', avatar: '/avatar8.png', message: '代码审查通过' },
-        { name: '用户9', avatar: '/avatar9.png', message: '新功能测试完成' },
-        { name: '用户10', avatar: '/avatar10.png', message: '下周工作计划' },
+        { name: '用户1', isRobot: true, avatar: svgToDataURL(svg), message: '你好，这是第一条消息' },
+        { name: '用户2', isRobot: true, avatar: svgToDataURL(svg), message: '今天的会议安排如何？' },
+        { name: '用户3', isRobot: true, avatar: svgToDataURL(svg), message: '请查看最新文档' },
+        { name: '用户4', isRobot: true, avatar: svgToDataURL(svg), message: '项目进度更新' },
     ]
 
 
     return (
         <div id="chat_container">
             {messagesList.map((item, index) => (
-                <ChatItem key={index} name={item.name} avatar={item.avatar} message={item.message}>
+                <ChatItem key={index} name={item.name} isRobot={item.isRobot} avatar={item.avatar} message={item.message}>
                 </ChatItem>
             ))}
 

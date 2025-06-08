@@ -1,0 +1,94 @@
+import * as vscode from 'vscode';
+import path from 'node:path';
+import { register } from 'node:module';
+
+
+class ChatViewProvider implements vscode.WebviewViewProvider {
+
+	private _context: vscode.ExtensionContext;
+	private _view?: vscode.WebviewView;
+
+	constructor(private context: vscode.ExtensionContext) {
+		this._context = context;
+	}
+
+	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
+
+		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview);
+		webviewView.webview.options = {
+			enableScripts: true
+		};
+		this._view = webviewView;
+		webviewView.onDidDispose(
+			() => {
+
+			},
+			null,
+			this.context.subscriptions,
+		);
+
+	}
+
+	public emitEvent(eventName: string, data: any) {
+		this._view?.webview.postMessage({
+			name: eventName,
+			data: data
+		});
+	}
+}
+
+
+function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null) {
+	let isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	let srcUrl = '';
+	let jsUrl = '';
+	let webviewInitUrl = '';
+	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist', 'static/js/main.js'));
+	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/webview','webview_init.js'));
+	if (webview) {
+		webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
+	}
+	if (isProduction) {
+		if (webview) {
+			jsUrl = webview.asWebviewUri(filePath).toString();
+		}
+	} else {
+		srcUrl = 'http://localhost:3000';
+		// srcUrl = panel.webview.asWebviewUri(filePath).toString();
+	}
+	//  <script defer="defer" src="${srcUri}"></script>
+
+	//<iframe sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads" src="${srcUri}"></iframe>
+	/*<iframe
+  id="webview-patch-iframe"
+  frameborder="0"
+  sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"
+  allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
+  src="${srcUri}"
+></iframe>*/
+	return `<!doctype html>
+  <html lang="en" style="height:100%">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>webview-react</title>
+		<script defer="defer" src="${jsUrl}"></script>
+		<script defer="defer" src="${webviewInitUrl}"></script>
+	</head>
+	<body style="height:95%">
+		<div id="root"></div>
+		<iframe
+			id="webview-patch-iframe"
+			frameborder="0"
+			sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"
+			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
+			style="width: 100%;height:100%"
+			src="${srcUrl}">
+		</iframe>
+	</body>
+  </html>`;
+}
+
+
+export default ChatViewProvider;

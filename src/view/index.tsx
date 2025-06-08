@@ -6,6 +6,7 @@ const root = document.getElementById('root');
 if (root) {
   createRoot(root).render(<App />);
 }
+
 window.addEventListener('message', receiveMessage, false);
 
 function receiveMessage(event: any) {

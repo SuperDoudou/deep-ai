@@ -16,7 +16,7 @@
       "activitybar": [
         {
           "id": "deep-ai-container",
-          "icon": "resources/deepAI.svg",
+          "icon": "src/resources/robot.svg",
           "title": "deep ai agent"
         }
       ]
@@ -34,12 +34,17 @@
       {
         "command": "deep-ai.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "deep-ai.getDoc",
+        "title": "GetDoc"
       }
     ]
   },
   "scripts": {
     "vscode:prepublish": "pnpm run build && pnpm run package",
     "dev": "webpack-dev-server -c webpack.dev.js",
+    "build_ex": "webpack -c webpack.config.js",
     "build": "webpack -c webpack.prod.js",
     "compile": "webpack",
     "watch": "webpack --watch",
@@ -54,6 +59,7 @@
     "@babel/core": "^7.27.4",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
+    "@svgr/webpack": "^8.1.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/react": "^19.1.6",
@@ -64,10 +70,14 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "babel-loader": "^10.0.0",
+    "copy-webpack-plugin": "^13.0.0",
     "css-loader": "^7.1.2",
     "eslint": "^9.25.1",
+    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.6.3",
+    "raw-loader": "^4.0.2",
     "style-loader": "^4.0.0",
+    "svg-url-loader": "^8.0.0",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.3",
     "webpack": "^5.99.7",

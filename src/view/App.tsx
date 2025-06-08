@@ -6,10 +6,10 @@ import ChatContainer from './chat/ChatItemContainer';
 function App() {
   return (
     <div id="app_root">
-  
+
       <ChatContainer></ChatContainer>
-   
-    </div>   
+
+    </div>
 
   );
 }
