@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import ContextArea from './ContextArea';
+import AppMessage from '../AppMessage';
 
 function InputArea({ onSendMessage }: { onSendMessage: (message: string) => void }) {
 
@@ -13,9 +15,11 @@ function InputArea({ onSendMessage }: { onSendMessage: (message: string) => void
     };
 
     const getDocInfo = () => {
-        
+
         return;
     };
+
+
 
     const handleInputSend = (e: any) => {
 
@@ -26,6 +30,7 @@ function InputArea({ onSendMessage }: { onSendMessage: (message: string) => void
 
     return (
         <div id="chat_input_part">
+            <ContextArea ></ContextArea>
             <textarea
                 id="chat_input_area"
                 value={inputMessage}

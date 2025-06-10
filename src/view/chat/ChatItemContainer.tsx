@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import InputArea from './InputArea';
 import ChatItem from './ChatItem';
 import svg from '../../resources/robot.svg'
+import App from '../App';
+import AppMessage from '../AppMessage';
 type MessageItem = {
     name: string;
     isRobot: boolean;
@@ -46,6 +48,7 @@ function ChatContainer() {
             message: message
         })
 
+        AppMessage.sendMessageToParent()
         setTimeout(() => {
             let randMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)]
             pushMessagesList(randMessage)

@@ -2,6 +2,12 @@ import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
 
+type InnerMessage = {
+	from: string; // extension|webview|react
+	eventName: string; // 事件名称，如：getCurrentFileName
+	data: string; // 数据，如：文件名
+};
+
 
 class ChatViewProvider implements vscode.WebviewViewProvider {
 
@@ -29,11 +35,13 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 	}
 
-	public emitEvent(eventName: string, data: any) {
-		this._view?.webview.postMessage({
-			name: eventName,
+	public emitEvent(eventName: string, data: string) {
+		let m: InnerMessage = {
+			from: 'extension',
+			eventName: eventName,
 			data: data
-		});
+		};
+		this._view?.webview.postMessage(m);
 	}
 }
 
@@ -44,7 +52,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 	let jsUrl = '';
 	let webviewInitUrl = '';
 	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist', 'static/js/main.js'));
-	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/webview','webview_init.js'));
+	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/webview', 'webview_init.js'));
 	if (webview) {
 		webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
 	}

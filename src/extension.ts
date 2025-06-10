@@ -32,10 +32,10 @@ function registeViewContainer(context: vscode.ExtensionContext) {
 function registeEvent(context: vscode.ExtensionContext) {
 	vscode.window.onDidChangeVisibleTextEditors(
 		() => {
-			provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName);
 			setTimeout(() => {
+				provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName || "");
 				vscode.window.visibleTextEditors.forEach((editor) => {
-					console.log(`fileName ${vscode.window.activeTextEditor?.document.fileName}`);
+					// console.log(`fileName ${vscode.window.activeTextEditor?.document.fileName}`);
 				});
 			}, 0);
 		},
