@@ -1,6 +1,6 @@
 console.log("in webview yeye");
 const iframe = document.getElementById('webview-patch-iframe');
-
+const vscode = acquireVsCodeApi();
 // type InnerMessage = {
 // 	from: string; // extension|webview|react
 // 	eventName: string; // 事件名称，如：getCurrentFileName
@@ -19,14 +19,16 @@ type InnerMessage = {
 
 window.addEventListener('message', event => {
     message = {
-        from: "webview", // extension|webview|react
-        eventName: event.data.eventName, // 事件名称，如：getCurrentFileName
+        from: event.data.from + "|webview", // vscode|webview|react
+        name: event.data.eventName, // 事件名称，如：getCurrentFileName
         data: event.data.data // 数据，如：文件名
     };
-    console.log("in webview " + message);
-    if (iframe) {
-        iframe.contentWindow.postMessage(message, "http://localhost:3000");
-    }
+    console.log("in webview " + JSON.stringify(message));
+    // 发送消息到插件
+    vscode.postMessage(message);
+    // if (iframe) {
+    //     iframe.contentWindow.postMessage(message, "http://localhost:3000");
+    // }
 });
 
 if (iframe) {

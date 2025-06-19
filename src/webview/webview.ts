@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
+import { DeepAiEvent } from '../Constant';
+import VsCodeEventService from '../VsCodeEventService';
 
 type InnerMessage = {
 	from: string; // extension|webview|react
@@ -24,11 +26,15 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.options = {
 			enableScripts: true
 		};
+		webviewView.webview.onDidReceiveMessage(
+			(message: DeepAiEvent) => {
+				console.log(`get message in vscode from ${message.from}, ${message.name}, ${message.data}`);
+				VsCodeEventService.onEvent(message);
+			}
+		);
 		this._view = webviewView;
 		webviewView.onDidDispose(
-			() => {
-
-			},
+			() => { },
 			null,
 			this.context.subscriptions,
 		);

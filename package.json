@@ -38,6 +38,14 @@
       {
         "command": "deep-ai.getDoc",
         "title": "GetDoc"
+      },
+      {
+        "command": "deep-ai.text",
+        "title": "decoration Text"
+      },
+      {
+        "command": "extension.addLineSuggestion",
+        "title": "Add Line Suggestion"
       }
     ]
   },
@@ -88,6 +96,8 @@
   },
   "dependencies": {
     "antd": "^5.26.0",
+    "diff": "^8.0.2",
+    "js-base64": "^3.7.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-syntax-highlighter": "^15.6.1"

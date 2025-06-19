@@ -64,6 +64,19 @@ textarea {
 
 
 #chat_container {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 95vh;
+    /* 确保容器至少和视口一样高 */
+}
+
+#chat_items {
+    flex: 1;
+    /* 占用剩余空间 */
+    overflow-y: auto;
+    /* 如果内容很多，允许滚动 */
+
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -72,10 +85,12 @@ textarea {
 }
 
 #chat_input_part {
-    margin-top: auto;
-    text-align: right;
+
+    text-align: center;
     width: 95%;
 }
+
+
 
 #chat_input_area {
     height: 150px;
@@ -121,6 +136,38 @@ textarea {
 
 .chat-item-user-avatar {
     border-radius: 50%;
+}
+
+.chat-item-language-block {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: top;
+    justify-content: space-between;
+}
+
+.chat-item-language-left, .chat-item-language-right {
+    display: flex;
+    flex-direction: row;
+    align-items: top;
+}
+
+.chat-item-language-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+}
+
+.chat-item-language-name {
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
+    width: 50px;
+    color: rgb(208, 255, 177);
+}
+
+.chat-item-language-button {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
 }
 
 .chat-item-reasoning-content {
