@@ -6,7 +6,7 @@ class LLMService {
         this.openai = new OpenAI(
             {
                 // 若没有配置环境变量，请用阿里云百炼API Key将下行替换为：apiKey: "sk-xxx",
-                apiKey: "sk-edaa40b5dd34493aa47d4771cbb884c5",
+                apiKey: "sk-6260c6b454ee474c95f5e179c9b76932",
                 baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
                 dangerouslyAllowBrowser: true,
             }

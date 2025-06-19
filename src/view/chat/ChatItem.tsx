@@ -2,6 +2,7 @@ import React from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import Utils from '../Utils';
+import VsCodeService from '../VsCodeService';
 
 
 interface ChatItemProps {
@@ -77,7 +78,7 @@ function ChatItem({ name, isRobot, avatar, message, reasoning }: ChatItemProps) 
                         return (
                             <div key={index}>
                                 <div className="chat-item-language-block">
-                                    
+
                                     <div className="chat-item-language-left">
                                         <img className="chat-item-language-icon"
                                             src={Utils.svgToDataURL(languageIcon)}></img>
@@ -91,20 +92,21 @@ function ChatItem({ name, isRobot, avatar, message, reasoning }: ChatItemProps) 
 
                                         <img className="chat-item-language-button"
                                             src={Utils.svgToDataURL(insertIcon)}
-                                            title='插入到光标处'
-                                            onClick={() => { Utils.copyTextToClipboard(block.content) }}></img>
+                                            title='应用代码'
+                                            onClick={() => {
+                                                VsCodeService.updateTextEditor(block.content)
+                                            }}></img>
                                     </div>
                                 </div>
                                 <SyntaxHighlighter
-                                    language="javascript"
+                                    language={block.language}  // 修改此处为动态语言类型
                                     className="custom-scroll"
                                     style={atomDark}
                                     wrapLines={true}
                                     customStyle={{
                                         paddingLeft: '0px',
                                         marginLeft: '0px',
-                                        overflow: 'auto', // 
-
+                                        overflow: 'auto',
                                     }}  >
                                     {block.content}
                                 </SyntaxHighlighter>
