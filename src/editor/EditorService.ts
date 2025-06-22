@@ -1,83 +1,98 @@
 import * as vscode from 'vscode';
 import VsCodeEventService from '../VsCodeEventService';
 import { UpdateCurrentEditorTextEvent } from '../Constant';
-import * as diff from 'diff';
 import * as path from 'path';
 import LineActionCodeLensProvider from './LineActionCodeLensProvider';
+import * as diff from 'diff-match-patch';
 interface ChangeInfo {
     id: string;
     range: vscode.Range;
     originalLines: string[];
     modifiedLines: string[];
+    type: 'add' | 'del' | 'modify'; // 明确类型定义
 }
 
 // 高亮显示要修改的行
 class EditorService {
     private static changeStates = new Map<string, Map<string, 'applied' | 'rejected'>>();
 
-    // 计算变更
     public static calculateChanges(original: string, modified: string): ChangeInfo[] {
-        // 获取当前所有可见编辑器
-        const diffEditors = vscode.window.visibleTextEditors.filter(e =>
-            e.document.uri.scheme === 'deep-ai-diff' ||
-            e.document.uri.scheme === 'file'
-        );
+        original = original + '\n';
 
-        // 获取左侧（原始）和右侧（修改后）的编辑器
-        const [leftEditor, rightEditor] = diffEditors;
-
-        // 通过API获取差异范围（需要VSCode 1.70+）
-        const diffRanges = (rightEditor as any)?.diffRanges?.[leftEditor.document.uri.toString()];
-
-
-
-
-
-        const diffResult = diff.diffLines(original, modified, {
-            newlineIsToken: true,    // 将换行符视为独立token
-            ignoreWhitespace: false // 不忽略空白字符
-        });
+        const dmp = new diff.diff_match_patch();
+        dmp.Match_Threshold = 1;
+        const chars = dmp.diff_linesToChars_(original, modified);
+        const lineText1 = chars.chars1;
+        const lineText2 = chars.chars2;
+        const lineArray = chars.lineArray;
+        let diffs = dmp.diff_main(lineText1, lineText2, false);
+        dmp.diff_charsToLines_(diffs, lineArray);
+        // dmp.diff_cleanupSemantic(diffs);
 
         const changes: ChangeInfo[] = [];
         let changeIndex = 0;
+        let originalLineNum = 0;
+        let modifiedLineNum = 0;
 
-        // 使用最长匹配算法处理差异
-        const patch = diff.createPatch('file', original, modified, '', '', { context: 0 });
-        const hunks = patch.split('\n').filter(line => line.startsWith('@@'));
-
-        hunks.forEach(hunk => {
-            // 改进正则表达式匹配hunk元数据
-            const hunkInfo = hunk.match(/@@ \-(\d+),?(\d*) \+(\d+),?(\d*) @@/);
-            if (hunkInfo) {
-                const newStartLine = parseInt(hunkInfo[3]) - 1;
-                const lineCount = parseInt(hunkInfo[4]) || 1;  // 处理单行变更情况
-
-                // 获取完整的修改行内容
-                const modifiedLines = modified.split('\n')
-                    .slice(newStartLine, newStartLine + lineCount)
-                    .filter(line => !line.startsWith('-'));  // 过滤被删除的行
-
-                const range = new vscode.Range(
-                    new vscode.Position(newStartLine, 0),
-                    new vscode.Position(newStartLine + modifiedLines.length, 0)
-                );
-
+        for (let i = 0; i < diffs.length; i++) {
+            let part = diffs[i];
+            let type = part[0];
+            let text = part[1];
+            const lines = text.split('\n');
+            lines.pop(); // 移除最后的空行
+            if (type === diff.DIFF_DELETE) {
+                // 删除类型变更
                 changes.push({
-                    id: `change-${changeIndex++}`,
-                    range,
-                    originalLines: [],
-                    modifiedLines
+                    id: `del-${changeIndex++}`,
+                    range: new vscode.Range(
+                        new vscode.Position(originalLineNum, 0),
+                        new vscode.Position(originalLineNum + lines.length, 0)
+                    ),
+                    originalLines: lines,
+                    modifiedLines: [],
+                    type: 'del'
                 });
+                originalLineNum += lines.length;
             }
-        });
+            else if (type === diff.DIFF_INSERT) {
+                // 新增类型变更
+                changes.push({
+                    id: `add-${changeIndex++}`,
+                    range: new vscode.Range(
+                        new vscode.Position(modifiedLineNum, 0),
+                        new vscode.Position(modifiedLineNum + lines.length, 0)
+                    ),
+                    originalLines: [],
+                    modifiedLines: lines,
+                    type: 'add'
+                });
+                modifiedLineNum += lines.length;
+            }
+            else {
+                // 处理修改类型（删除+新增组合）
+                if (changes.length > 0 &&
+                    changes[changes.length - 1].type === 'del' &&
+                    lines.length > 0) {
+
+                    const lastChange = changes[changes.length - 1];
+                    lastChange.type = 'modify';
+                    lastChange.modifiedLines = lines;
+                    lastChange.range = new vscode.Range(
+                        lastChange.range.start,
+                        new vscode.Position(modifiedLineNum + lines.length, 0)
+                    );
+                }
+                originalLineNum += lines.length;
+                modifiedLineNum += lines.length;
+            }
+        }
 
         return changes;
     }
 
-
     public static addDiffCodeLenses(originalUri: vscode.Uri, originalContent: string, modifiedContent: string) {
         const editors = vscode.window.visibleTextEditors;
-        if (editors.length < 2) return;
+        if (editors.length < 2) { return; }
 
         // 找到右侧编辑器（修改后的版本）
         const rightEditor = editors.find(e =>
@@ -85,7 +100,7 @@ class EditorService {
             //  && e.viewColumn === vscode.ViewColumn.Two
         );
 
-        if (!rightEditor) return;
+        if (!rightEditor) { return; }
 
         const changes = EditorService.calculateChanges(originalContent, modifiedContent);
         const uri = originalUri.toString();
@@ -112,26 +127,6 @@ class EditorService {
 
             // rightEditor.setDecorations(decorationType, [change.range]);
         });
-    }
-
-    public static generateMergedContent(original: string, modified: string, states: Map<string, 'applied' | 'rejected'>): string {
-        const diffResult = diff.diffLines(original, modified);
-        let result = '';
-        let changeIndex = 0;
-
-        diffResult.forEach(part => {
-            if (part.added) {
-                const state = states.get(changeIndex.toString()) || 'applied';
-                if (state === 'applied') {
-                    result += part.value;
-                }
-                changeIndex++;
-            } else if (!part.removed) {
-                result += part.value;
-            }
-        });
-
-        return result;
     }
 
     private static getFileExtension(filename: string): string {
@@ -162,6 +157,7 @@ class EditorService {
         let updateCurrentEditorText = new UpdateCurrentEditorTextEvent();
         VsCodeEventService.registerEvent(updateCurrentEditorText.name,
             (event) => {
+                LineActionCodeLensProvider.codeLensProviderInstance.clearSuggestions()
                 console.log(`get information22 ${event.resolveData()}`);
                 const editor = vscode.window.activeTextEditor;
                 if (!editor) {
@@ -177,7 +173,7 @@ class EditorService {
                 const modifiedContent = EditorService.generateModifiedContent(originalContent);
 
                 // 创建虚拟文档URI
-                let type = EditorService.getFileExtension(document.uri.path)
+                let type = EditorService.getFileExtension(document.uri.path);
                 const virtualUri = document.uri.with({
                     scheme: 'deep-ai-diff',
                     path: document.uri.path + '.modified' + (type === "" ? "" : "." + type),
@@ -190,10 +186,6 @@ class EditorService {
                         const originalUri = vscode.Uri.parse(new URLSearchParams(uri.query).get('original') || '');
                         const fileStates = EditorService.changeStates.get(originalUri.toString()) || new Map();
 
-                        // 如果已经保存了状态，使用合并后的内容
-                        if (fileStates.size > 0) {
-                            return EditorService.generateMergedContent(originalContent, modifiedContent, fileStates);
-                        }
 
                         return modifiedContent;
                     }

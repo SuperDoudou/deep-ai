@@ -16,6 +16,9 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 	private _context: vscode.ExtensionContext;
 	private _view?: vscode.WebviewView;
 
+	public getView() {
+		return this._view;
+	}
 	constructor(private context: vscode.ExtensionContext) {
 		this._context = context;
 	}
@@ -28,7 +31,7 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 		};
 		webviewView.webview.onDidReceiveMessage(
 			(message: DeepAiEvent) => {
-				console.log(`get message in vscode from ${message.from}, ${message.name}, ${message.data}`);
+				console.log(`[webview provider] on event ${message.from}, ${message.name}, ${message.data}`);
 				VsCodeEventService.onEvent(message);
 			}
 		);
@@ -41,14 +44,15 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 	}
 
-	public emitEvent(eventName: string, data: string) {
-		let m: InnerMessage = {
-			from: 'extension',
-			eventName: eventName,
-			data: data
-		};
-		this._view?.webview.postMessage(m);
-	}
+	// public emitEvent(eventName: string, data: string) {
+	// 	console.log('[webview provider] emit event', eventName, data);
+	// 	let m: InnerMessage = {
+	// 		from: eventName.,
+	// 		eventName: eventName,
+	// 		data: data
+	// 	};
+	// 	this._view?.webview.postMessage(m);
+	// }
 }
 
 

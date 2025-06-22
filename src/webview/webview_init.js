@@ -23,7 +23,7 @@ window.addEventListener('message', event => {
         name: event.data.eventName, // 事件名称，如：getCurrentFileName
         data: event.data.data // 数据，如：文件名
     };
-    console.log("in webview " + JSON.stringify(message));
+    console.log("[webview] revieve event" + JSON.stringify(message));
     // 发送消息到插件
     vscode.postMessage(message);
     // if (iframe) {

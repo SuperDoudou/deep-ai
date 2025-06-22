@@ -9,6 +9,10 @@ class LineActionCodeLensProvider implements vscode.CodeLensProvider {
 
     onDidChangeCodeLenses = this.eventEmitter.event;
 
+    clearSuggestions() {
+        this.suggestions.clear();
+        this.eventEmitter.fire(); // 触发更新
+    }
     // 添加修改建议
     addSuggestion(lineNumber: number, oldText: string, newText: string) {
         this.suggestions.set(lineNumber, { oldText, newText });

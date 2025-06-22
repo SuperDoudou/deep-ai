@@ -6,7 +6,7 @@ export class DeepAiEvent {
     public data: string = "";
     public injectData: (...args: any[]) => any = () => { };
     public resolveData: (...args: any[]) => any = () => { };
-    
+
     public static fromEventName(name: string, data: string) {
         let e: DeepAiEvent = new DeepAiEvent;
         if (name === "updateCurrentEditorText") {
@@ -33,3 +33,21 @@ export class UpdateCurrentEditorTextEvent implements DeepAiEvent {
         };
 }
 
+
+export class ChangeVisibleTextEditorsEvent implements DeepAiEvent {
+    name: string = "changeVisibleTextEditors";
+    from: string = "vscode";
+    description: string = "vscode 向 webview 发送当前编辑器文本";
+    data: string = "";
+    injectData: (filePath: string, fileText: string) => void =
+        (filePath: string, fileText: string) => {
+            this.data = JSON.stringify({
+                filePath,
+                fileText,
+            });
+        };
+    resolveData: () => { filePath: string, fileText: string } =
+        () => {
+            return JSON.parse(this.data);
+        };
+}

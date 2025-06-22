@@ -22,7 +22,7 @@ class AppMessage {
    * @param eventName 
    * @param callback 
    */
-  private static addEventListener = (eventName: string, callback: (data: string) => void) => {
+  public static addEventListener = (eventName: string, callback: (data: string) => void) => {
     let list = this.listenerMap.get(eventName)
     if (!list) {
       list = [callback];

@@ -5,6 +5,8 @@ import ChatViewProvider from './webview/webview';
 import EditorDecoration from './editor/EditorDecoration';
 import LineActionCodeLensProvider from './editor/LineActionCodeLensProvider';
 import EditorService from './editor/EditorService';
+import VsCodeEventService from './VsCodeEventService';
+import { DeepAiEvent, ChangeVisibleTextEditorsEvent } from './Constant';
 
 var provider: ChatViewProvider;
 export function activate(context: vscode.ExtensionContext) {
@@ -39,6 +41,7 @@ function registeCommand(context: vscode.ExtensionContext) {
 function registeViewContainer(context: vscode.ExtensionContext) {
 	provider = new ChatViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider("deep-ai-view", provider));
+	VsCodeEventService.setChatViewProvider(provider);
 }
 
 
@@ -47,10 +50,17 @@ function registeEvent(context: vscode.ExtensionContext) {
 	vscode.window.onDidChangeVisibleTextEditors(
 		() => {
 			setTimeout(() => {
-				provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName || "");
-				vscode.window.visibleTextEditors.forEach((editor) => {
-					// console.log(`fileName ${vscode.window.activeTextEditor?.document.fileName}`);
-				});
+				let event = new ChangeVisibleTextEditorsEvent();
+				event.injectData(vscode.window.activeTextEditor?.document.fileName || "", vscode.window.activeTextEditor?.document.getText() || "");
+				// !!!// event.injectData(vscode.window.visibleTextEditors.map((editor) => {
+				// 	return editor.document.fileName;
+				// }));
+				VsCodeEventService.emitEvent(event);
+
+				// provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName || "");
+				// vscode.window.visibleTextEditors.forEach((editor) => {
+				// 	// console.log(`fileName ${vscode.window.activeTextEditor?.document.fileName}`);
+				// });
 			}, 0);
 		},
 	);
