@@ -42,7 +42,8 @@ function ChatContainer() {
     useEffect(() => {
         LLMService.init()
         let randMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)]
-        let messageItem = new MessageItem()
+        let messageItem = new MessageItem(randMessage.name, randMessage.isRobot, randMessage.avatar,
+            randMessage.message, randMessage.reasoningContent)
         messageItem.name = randMessage.name
         messageItem.isRobot = randMessage.isRobot
         messageItem.avatar = randMessage.avatar
@@ -89,7 +90,6 @@ function ChatContainer() {
                 answerMessageItem.setMessage(m);
                 setCount(count => count + 1)
             })
-        AppMessage.sendMessageToParent()
 
     }
 

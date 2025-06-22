@@ -9,26 +9,31 @@ const vscode = acquireVsCodeApi();
 
 /**
  * 
-type InnerMessage = {
-  from: string; // extension|webview|react
-  eventName: string; // 事件名称，如：getCurrentFileName
-  data: string; // 数据，如：文件名
-};
 
  */
 
 window.addEventListener('message', event => {
     message = {
         from: event.data.from + "|webview", // vscode|webview|react
-        name: event.data.eventName, // 事件名称，如：getCurrentFileName
+        name: event.data.name, // 事件名称，如：getCurrentFileName
         data: event.data.data // 数据，如：文件名
     };
-    console.log("[webview] revieve event" + JSON.stringify(message));
-    // 发送消息到插件
-    vscode.postMessage(message);
-    // if (iframe) {
-    //     iframe.contentWindow.postMessage(message, "http://localhost:3000");
-    // }
+
+    console.log("[webview html] revieve event from " + event.data.from + " message:" + JSON.stringify(message));
+    if (event.data.from.startsWith("vscode")) {
+        if (iframe) {
+            iframe.contentWindow.postMessage(message, "http://localhost:3000");
+        }
+        return;
+    }
+    if (event.data.from.startsWith("react")) {
+        // 发送消息到插件
+        vscode.postMessage(message);
+        return;
+    }
+
+
+
 });
 
 if (iframe) {

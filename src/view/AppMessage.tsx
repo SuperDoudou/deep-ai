@@ -6,11 +6,6 @@ import ChatContainer from './chat/ChatItemContainer';
 import { DeepAiEvent } from '../Constant';
 import { fromBase64 } from 'js-base64';
 
-type InnerMessage = {
-  from: string; // extension|webview|react
-  eventName: string; // 事件名称，如：getCurrentFileName
-  data: string; // 数据，如：文件名
-};
 
 
 class AppMessage {
@@ -35,19 +30,19 @@ class AppMessage {
   public static init = () => {
     window.addEventListener('message', (event) => {
       // 验证来源域名
-      let innerMessage: InnerMessage = JSON.parse(JSON.stringify(event.data)) as InnerMessage;
+      let innerMessage: DeepAiEvent = JSON.parse(JSON.stringify(event.data)) as DeepAiEvent;
       if (innerMessage.from == undefined || innerMessage.from.startsWith("react")) {
         // 不处理
         return
       }
-      console.log(`get message in react from ${innerMessage.from}, ${innerMessage.eventName}, ${innerMessage.data}`);
+      console.log(`[react] get message from ${innerMessage.from}, ${innerMessage.name}, ${innerMessage.data}`);
       AppMessage.messageHandler(innerMessage);
     });
   }
 
   //
-  public static messageHandler(innerMessage: InnerMessage) {
-    let list = this.listenerMap.get(innerMessage.eventName)
+  public static messageHandler(innerMessage: DeepAiEvent) {
+    let list = this.listenerMap.get(innerMessage.name)
     list?.forEach(callback => {
       callback(innerMessage.data)
     });
@@ -63,7 +58,7 @@ class AppMessage {
     console.log(`发送消息`)
     const message = {
       from: "react",
-      eventName: eventName,
+      name: eventName,
       data: data
     };
     window.parent.postMessage(message, "*"); // 替换为目标来源

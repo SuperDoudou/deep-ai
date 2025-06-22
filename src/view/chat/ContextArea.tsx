@@ -1,27 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import AppMessage from '../AppMessage';
+import { ChangeVisibleTextEditorsEvent } from '../../Constant';
 
 function ContextArea() {
 
     const [fileName, setFileName] = useState('demo.docx');
 
+    const [fileText, setFileText] = useState('');
 
     useEffect(() => {
-        AppMessage.addEventListener('changeVisibleTextEditors', (data) => {
-            console.log(`get file name ${data}`)
-            // data 是一个文件路径，获取到文件名
-            let tempList = data.split('/')
+        let event = new ChangeVisibleTextEditorsEvent()
+        AppMessage.addEventListener(event.name, (data) => {
+            event.data = data
+            let { filePath, fileText } = event.resolveData()
+            console.log(`get file name ${filePath}`)
+            console.log(`get file text ${fileText}`)
+
+            let tempList = filePath.split('/')
             let temp = tempList[tempList.length - 1]
-            tempList = data.split('\\')
+            tempList = filePath.split('\\')
             temp = tempList[tempList.length - 1]
             setFileName(temp)
+            setFileText(fileText)
         })
 
     }, []);
 
     return (
         <div id="chat-context-area">
-            {fileName}
+            #{fileName}
         </div>
     );
 }

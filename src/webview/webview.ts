@@ -31,6 +31,9 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 		};
 		webviewView.webview.onDidReceiveMessage(
 			(message: DeepAiEvent) => {
+				if (message.from.startsWith("vscode")) {
+					return;
+				}
 				console.log(`[webview provider] on event ${message.from}, ${message.name}, ${message.data}`);
 				VsCodeEventService.onEvent(message);
 			}
