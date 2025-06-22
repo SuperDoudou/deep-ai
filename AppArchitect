@@ -1,0 +1,9 @@
+DeepAI架构
+
+消息系统
+========================              ========================              =========================              ========================
+|   vs code extension  |              |   webview provider   |              |     webview html      |              |        react         |
+|  VsCodeEventService  |              |   ChatViewProvider   |              |                       |              |     AppMessage       |     
+|      fireEvent       |      =>      |       emitEvent      |      =>      |                       |       =>     |     messageHandler   | 
+|      onEvent         |      <=      |  onDidReceiveMessage |      <=      |window.addEventListener|       <=     |      sendMessage     |
+========================              ========================              =========================              ======================== 
