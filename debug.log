@@ -6,3 +6,4 @@
 [0602/030256.381:ERROR:registration_protocol_win.cc(108)] CreateFile: 系统找不到指定的文件。 (0x2)
 [0602/030259.473:ERROR:registration_protocol_win.cc(108)] CreateFile: 系统找不到指定的文件。 (0x2)
 [0602/030438.311:ERROR:registration_protocol_win.cc(108)] CreateFile: 系统找不到指定的文件。 (0x2)
+[0623/001748.953:ERROR:crashpad_client_win.cc(188)] crash server did not respond, self-terminating

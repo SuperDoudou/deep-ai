@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import AppMessage from '../AppMessage';
 import { ChangeVisibleTextEditorsEvent } from '../../Constant';
+import { JSX } from 'react/jsx-runtime';
 
-function ContextArea() {
+export interface ContextAreaInfo {
+    fileName: string;
+    fileText: string;
+
+}
+export const ContextArea = forwardRef((props, ref) => {
 
     const [fileName, setFileName] = useState('demo.docx');
 
@@ -26,11 +32,18 @@ function ContextArea() {
 
     }, []);
 
+    useImperativeHandle(ref, () => ({
+        getDocInfo: () => {
+            return {
+                fileText,
+                fileName
+            } as ContextAreaInfo
+        },
+    }));
+
     return (
         <div id="chat-context-area">
             #{fileName}
         </div>
     );
-}
-
-export default ContextArea;
+});

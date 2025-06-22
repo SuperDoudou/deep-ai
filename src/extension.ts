@@ -11,12 +11,15 @@ import { DeepAiEvent, ChangeVisibleTextEditorsEvent } from './Constant';
 var provider: ChatViewProvider;
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "my-vscode-extendsion" is now active!');
-	// 注册CodeLens提供器
-	initConfig(context)
-	registeCodeLens(context);
-	registeCommand(context);
-	registeViewContainer(context);
-	registeEvent(context);
+	try {
+		initConfig(context)
+		registeCodeLens(context);
+		registeCommand(context);
+		registeViewContainer(context);
+		registeEvent(context);
+	} catch (error) {
+		console.log(error);
+	}
 }
 
 export function deactivate() { }

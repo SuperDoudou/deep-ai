@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import ContextArea from './ContextArea';
+import React, { useEffect, useRef, useState } from 'react';
+import { ContextArea, ContextAreaInfo } from './ContextArea';
 import AppMessage from '../AppMessage';
 
-function InputArea({ onSendMessage }: { onSendMessage: (message: string) => void }) {
+function InputArea({ onSendMessage }: { onSendMessage: (message: string, contextAreaInfo: ContextAreaInfo) => void }) {
 
     const [inputMessage, setInputMessage] = useState('');
+    const contextAreaRef = useRef<typeof ContextArea>(null);
 
     const handleInputChange = (e: any) => {
         let data = e.target.value;
@@ -22,15 +23,15 @@ function InputArea({ onSendMessage }: { onSendMessage: (message: string) => void
 
 
     const handleInputSend = (e: any) => {
-
-        getDocInfo()
-
-        onSendMessage(inputMessage);
+        let contextAreaInfo = contextAreaRef.current?.getDocInfo()
+        console.log(`fileName${contextAreaInfo.fileName} fileTexts:${contextAreaInfo.fileText}`)
+        let prompt = `文件名是： ${contextAreaInfo.fileName},文件内容是：${contextAreaInfo.fileText},${inputMessage}`
+        onSendMessage(inputMessage, contextAreaInfo);
     };
 
     return (
         <div id="chat_input_part">
-            <ContextArea ></ContextArea>
+            <ContextArea ref={contextAreaRef}></ContextArea>
             <textarea
                 id="chat_input_area"
                 value={inputMessage}
