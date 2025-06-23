@@ -18,7 +18,7 @@ class LLMService {
         updateReasoning: (reasoningContent: string) => void,
         updateAnswer: (answer: string) => void) => {
 
-        let prompt = `文件名是： ${contextAreaInfo.fileName},文件内容是：${contextAreaInfo.fileText},${message}`
+        let prompt = `文件名是： ${contextAreaInfo.fileName},文件内容是：${contextAreaInfo.fileText},生成的代码需要参考文件的缩进符号，指令是：${message}`
         console.log('prompt',prompt)
         const stream = await this.openai.chat.completions.create({
             model: "deepseek-r1-distill-llama-70b",  // 此处以 deepseek-r1 为例，可按需更换模型名称。

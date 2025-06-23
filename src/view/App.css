@@ -58,7 +58,7 @@ body {
 textarea {
     color: #d4d4d4;
     background-color: rgb(30, 30, 30);
-    width: 98%;
+    /* width: 100%; */
 
 }
 
@@ -68,6 +68,7 @@ textarea {
     display: flex;
     flex-direction: column;
     min-height: 95vh;
+    width: 100%;
     /* 确保容器至少和视口一样高 */
 }
 
@@ -85,16 +86,20 @@ textarea {
 }
 
 #chat_input_part {
-
+    box-sizing: border-box;
     text-align: center;
-    width: 95%;
+    padding: 0px;
+    width: 100%;
 }
 
 
 
 #chat_input_area {
+    box-sizing: border-box;
+    padding: 3px;
+    margin: 0px;
     height: 150px;
-    width: 100%;
+    width: calc(100% - 10px);
 }
 
 #chat_input_button {
@@ -139,14 +144,16 @@ textarea {
 }
 
 .chat-item-language-block {
-    width: 100%;
+    width: calc(100% - 12px);
     display: flex;
     flex-direction: row;
     align-items: top;
     justify-content: space-between;
+    padding: 6px;
 }
 
-.chat-item-language-left, .chat-item-language-right {
+.chat-item-language-left,
+.chat-item-language-right {
     display: flex;
     flex-direction: row;
     align-items: top;
@@ -175,19 +182,21 @@ textarea {
     padding-left: 15px;
     padding-top: 10px;
     padding-bottom: 10px;
-    background-color: rgb(30, 30, 30);
+    background-color: rgb(48, 48, 48);
     border-left: 2px solid #b6b6b6;
     /*  颜色变浅 */
-    opacity: 0.5;
+    opacity: 0.6;
 }
 
 .chat-item-content {
-    background-color: rgb(30, 30, 30);
-    border-radius: 3px;
-    padding: 5px;
+    /* background-color: rgb(77, 77, 77); */
+    border-radius: 5px;
+    padding: px;
 }
 
 .chat-item-content-code {
     background-color: rgb(10, 10, 10);
+    padding: 0px;
+    margin: 0px;
     color: #d4d4d4;
 }

@@ -5,7 +5,7 @@ class VsCodeService {
 
     public static updateTextEditor(text: string) {
         let event = new UpdateCurrentEditorTextEvent()
-        event.injectData(text)
+        event.injectData("", text)
         AppMessage.sendMessage(event)
     }
 }

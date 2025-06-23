@@ -50,7 +50,7 @@ class AppMessage {
   }
 
   public static sendMessage = (event: DeepAiEvent) => {
-    this.sendMessageToParent(event.name, event.resolveData())
+    this.sendMessageToParent(event.name, event.data)
   }
 
 

@@ -53,8 +53,18 @@ function registeEvent(context: vscode.ExtensionContext) {
 	vscode.window.onDidChangeVisibleTextEditors(
 		() => {
 			setTimeout(() => {
+				let fileName = vscode.window.activeTextEditor?.document.fileName || "";
+				let fileText = vscode.window.activeTextEditor?.document.getText() || "";
+				if (vscode.window.visibleTextEditors?.some(
+					(editor) => editor.document.uri.scheme === 'deep-ai-diff'
+				)) {
+					return;
+				}
+				if (fileName === "") {
+					return;
+				}
 				let event = new ChangeVisibleTextEditorsEvent();
-				event.injectData(vscode.window.activeTextEditor?.document.fileName || "", vscode.window.activeTextEditor?.document.getText() || "");
+				event.injectData(fileName, fileText);
 				// !!!// event.injectData(vscode.window.visibleTextEditors.map((editor) => {
 				// 	return editor.document.fileName;
 				// }));

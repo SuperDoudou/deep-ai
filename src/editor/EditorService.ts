@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import VsCodeEventService from '../VsCodeEventService';
-import { UpdateCurrentEditorTextEvent } from '../Constant';
+import { DeepAiEvent, UpdateCurrentEditorTextEvent } from '../Constant';
 import * as path from 'path';
 import LineActionCodeLensProvider from './LineActionCodeLensProvider';
 import * as diff from 'diff-match-patch';
 interface ChangeInfo {
     id: string;
-    range: vscode.Range;
+    originalRange: vscode.Range;// 老文件对应的改动点
+    modifiedRange: vscode.Range;// 新文件对应的改动点
     originalLines: string[];
     modifiedLines: string[];
     type: 'add' | 'del' | 'modify'; // 明确类型定义
@@ -17,6 +18,11 @@ class EditorService {
     private static changeStates = new Map<string, Map<string, 'applied' | 'rejected'>>();
 
     public static calculateChanges(original: string, modified: string): ChangeInfo[] {
+        // 计算original的缩进符号
+        
+
+
+
         original = original + '\n';
 
         const dmp = new diff.diff_match_patch();
@@ -44,9 +50,13 @@ class EditorService {
                 // 删除类型变更
                 changes.push({
                     id: `del-${changeIndex++}`,
-                    range: new vscode.Range(
+                    originalRange: new vscode.Range(
                         new vscode.Position(originalLineNum, 0),
                         new vscode.Position(originalLineNum + lines.length, 0)
+                    ),
+                    modifiedRange: new vscode.Range(
+                        new vscode.Position(modifiedLineNum, 0),
+                        new vscode.Position(modifiedLineNum + lines.length, 0)
                     ),
                     originalLines: lines,
                     modifiedLines: [],
@@ -58,7 +68,11 @@ class EditorService {
                 // 新增类型变更
                 changes.push({
                     id: `add-${changeIndex++}`,
-                    range: new vscode.Range(
+                    originalRange: new vscode.Range(
+                        new vscode.Position(originalLineNum, 0),
+                        new vscode.Position(originalLineNum + lines.length, 0)
+                    ),
+                    modifiedRange: new vscode.Range(
                         new vscode.Position(modifiedLineNum, 0),
                         new vscode.Position(modifiedLineNum + lines.length, 0)
                     ),
@@ -69,19 +83,6 @@ class EditorService {
                 modifiedLineNum += lines.length;
             }
             else {
-                // 处理修改类型（删除+新增组合）
-                if (changes.length > 0 &&
-                    changes[changes.length - 1].type === 'del' &&
-                    lines.length > 0) {
-
-                    const lastChange = changes[changes.length - 1];
-                    lastChange.type = 'modify';
-                    lastChange.modifiedLines = lines;
-                    lastChange.range = new vscode.Range(
-                        lastChange.range.start,
-                        new vscode.Position(modifiedLineNum + lines.length, 0)
-                    );
-                }
                 originalLineNum += lines.length;
                 modifiedLineNum += lines.length;
             }
@@ -111,7 +112,7 @@ class EditorService {
             const state = fileStates.get(change.id);
             const isApplied = state === 'applied';
             const isRejected = state === 'rejected';
-            LineActionCodeLensProvider.codeLensProviderInstance.addSuggestion(change.range.start.line, "nnn", "ooo")
+            LineActionCodeLensProvider.codeLensProviderInstance.addSuggestion(change.modifiedRange.start.line, "nnn", "ooo")
             // 应用装饰器显示状态
             // const decorationType = vscode.window.createTextEditorDecorationType({
             //     isWholeLine: true,
@@ -152,12 +153,22 @@ class EditorService {
             .replace(/\)\s*{/g, ') => {')
             + '\n\n// 添加的安全检查函数\nfunction safeAccess(obj, path) {\n  return path.split(\'.\').reduce((acc, part) => acc && acc[part], obj);\n}';
     }
-    public static init() {
 
+    private static modifiedContent = "";
+    public static init() {
         let updateCurrentEditorText = new UpdateCurrentEditorTextEvent();
+        // 注册内容提供者
+        vscode.workspace.registerTextDocumentContentProvider('deep-ai-diff', {
+            provideTextDocumentContent: (uri) => {
+                const originalUri = vscode.Uri.parse(new URLSearchParams(uri.query).get('original') || '');
+                return EditorService.modifiedContent;
+            }
+        });
         VsCodeEventService.registerEvent(updateCurrentEditorText.name,
-            (event) => {
-                LineActionCodeLensProvider.codeLensProviderInstance.clearSuggestions()
+            (messageEvent) => {
+                let event: UpdateCurrentEditorTextEvent = DeepAiEvent.fromEventName(messageEvent.name, messageEvent.data);
+
+                LineActionCodeLensProvider.codeLensProviderInstance.clearSuggestions();
                 console.log(`get information22 ${event.resolveData()}`);
                 const editor = vscode.window.activeTextEditor;
                 if (!editor) {
@@ -170,26 +181,17 @@ class EditorService {
                 const originalContent = document.getText();
 
                 // 生成修改建议
-                const modifiedContent = EditorService.generateModifiedContent(originalContent);
-
+                const data = event.resolveData();
+                EditorService.modifiedContent = data.fileText;
                 // 创建虚拟文档URI
                 let type = EditorService.getFileExtension(document.uri.path);
                 const virtualUri = document.uri.with({
                     scheme: 'deep-ai-diff',
-                    path: document.uri.path + '.modified' + (type === "" ? "" : "." + type),
+                    path: document.uri.path + '.modified' + Date.now() + (type === "" ? "" : "." + type),
                     query: `original=${encodeURIComponent(document.uri.toString())}`
                 });
 
-                // 注册内容提供者
-                vscode.workspace.registerTextDocumentContentProvider('deep-ai-diff', {
-                    provideTextDocumentContent: (uri) => {
-                        const originalUri = vscode.Uri.parse(new URLSearchParams(uri.query).get('original') || '');
-                        const fileStates = EditorService.changeStates.get(originalUri.toString()) || new Map();
 
-
-                        return modifiedContent;
-                    }
-                });
 
                 // 打开diff视图
                 vscode.commands.executeCommand('vscode.diff',
@@ -200,7 +202,7 @@ class EditorService {
 
                 // 计算差异并添加按钮
                 // setTimeout(() => EditorService.addDiffButtons(document.uri, originalContent, modifiedContent), 500);
-                setTimeout(() => EditorService.addDiffCodeLenses(virtualUri, originalContent, modifiedContent), 500);
+                setTimeout(() => EditorService.addDiffCodeLenses(virtualUri, originalContent, EditorService.modifiedContent), 500);
             }
         );
     }

@@ -11,7 +11,9 @@ export class DeepAiEvent {
         let e: DeepAiEvent = new DeepAiEvent;
         if (name === "updateCurrentEditorText") {
             e = new UpdateCurrentEditorTextEvent();
-
+        }
+        if (name === "changeVisibleTextEditors") {
+            e = new ChangeVisibleTextEditorsEvent();
         }
         e.data = data;
         return e;
@@ -23,13 +25,19 @@ export class UpdateCurrentEditorTextEvent implements DeepAiEvent {
     from: string = "react";
     description: string = "webview 向 vscode 发送当前编辑器文本";
     data: string = "";
-    injectData: (text: string) => void =
-        (text: string) => {
-            this.data = text;
+    injectData: (filePath: string, fileText: string) => void =
+        (filePath: string, fileText: string) => {
+            this.data = JSON.stringify({
+                filePath,
+                fileText,
+            });
         };
-    resolveData: () => {} =
+    resolveData: () => { filePath: string, fileText: string } =
         () => {
-            return this.data;
+            return JSON.parse(this.data) as {
+                filePath: string,
+                fileText: string,
+            };
         };
 }
 
