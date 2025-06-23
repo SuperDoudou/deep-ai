@@ -40,6 +40,19 @@ function registeCommand(context: vscode.ExtensionContext) {
 		EditorDecoration.addButtonToLine(vscode.window.activeTextEditor!, 1);
 	});
 	context.subscriptions.push(textDecorationDisposable);
+
+	let acceptLineChangeDisposable = vscode.commands.registerCommand('deep-ai.acceptLineChange', (line: number, changeContext: ChangeContext) => {
+		vscode.window.showInformationMessage('decoration get text');
+		EditorService.dealChange(line, true, changeContext);
+	});
+	context.subscriptions.push(acceptLineChangeDisposable);
+
+	let rejectLineChangeDisposable = vscode.commands.registerCommand('deep-ai.rejectLineChange', (line: number, changeContext: ChangeContext) => {
+		vscode.window.showInformationMessage('decoration get text');
+		EditorService.dealChange(line, false, changeContext);
+
+	});
+	context.subscriptions.push(rejectLineChangeDisposable);
 }
 function registeViewContainer(context: vscode.ExtensionContext) {
 	provider = new ChatViewProvider(context);

@@ -107,13 +107,13 @@ function ChatItem({ name, isRobot, avatar, message, reasoning }: ChatItemProps) 
                                                 title='接受代码'
                                                 onClick={() => {
                                                     setHasAccept(true)
-                                                    VsCodeService.updateTextEditor(block.content)
+                                                    VsCodeService.acceptTextEditor(block.content)
                                                 }}></img>
                                         )}
                                         {hasAccept && (
                                             <img className="chat-item-language-button"
                                                 src={Utils.svgToDataURL(doneIcon)}
-                                                title='接受代码'
+                                                title='已完成'
                                                 onClick={() => {
                                                 }}></img>
                                         )}

@@ -15,6 +15,9 @@ export class DeepAiEvent {
         if (name === "changeVisibleTextEditors") {
             e = new ChangeVisibleTextEditorsEvent();
         }
+        if (name === "acceptVisibleTextEditors") {
+            e = new AcceptCurrentEditorTextEvent();
+        }
         e.data = data;
         return e;
     }
@@ -41,6 +44,24 @@ export class UpdateCurrentEditorTextEvent implements DeepAiEvent {
         };
 }
 
+export class AcceptCurrentEditorTextEvent implements DeepAiEvent {
+    name: string = "acceptCurrentEditorText";
+    from: string = "react";
+    description: string = "webview 向 vscode 接受当前文本所有改动";
+    data: string = "";
+    injectData: (filePath: string,) => void =
+        (filePath: string,) => {
+            this.data = JSON.stringify({
+                filePath,
+            });
+        };
+    resolveData: () => { filePath: string } =
+        () => {
+            return JSON.parse(this.data) as {
+                filePath: string,
+            };
+        };
+}
 
 export class ChangeVisibleTextEditorsEvent implements DeepAiEvent {
     name: string = "changeVisibleTextEditors";
