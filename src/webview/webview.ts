@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
-import { DeepAiEvent } from '../Constant';
+import { DeepAiEvent, ExtensionEnv } from '../Constant';
 import VsCodeEventService from '../VsCodeEventService';
 
 type InnerMessage = {
@@ -60,7 +60,7 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 
 function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null) {
-	let isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	let isProduction = ExtensionEnv.isProduction === true;
 	let srcUrl = '';
 	let jsUrl = '';
 	let webviewInitUrl = '';

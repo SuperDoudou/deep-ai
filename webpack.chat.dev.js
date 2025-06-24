@@ -1,6 +1,6 @@
 const path = require('path');
 const { merge } = require('webpack-merge');
-const baseConfig = require('./webpack.base.js');
+const baseConfig = require('./webpack.chat.base.js');
 
 module.exports = merge(baseConfig, {
   mode: 'development',

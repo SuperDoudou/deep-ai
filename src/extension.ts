@@ -6,13 +6,13 @@ import EditorDecoration from './editor/EditorDecoration';
 import LineActionCodeLensProvider from './editor/LineActionCodeLensProvider';
 import EditorService from './editor/EditorService';
 import VsCodeEventService from './VsCodeEventService';
-import { DeepAiEvent, ChangeVisibleTextEditorsEvent } from './Constant';
+import { DeepAiEvent, ChangeVisibleTextEditorsEvent, ExtensionEnv } from './Constant';
 
 var provider: ChatViewProvider;
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "my-vscode-extendsion" is now active!');
 	try {
-		initConfig(context)
+		initConfig(context);
 		registeCodeLens(context);
 		registeCommand(context);
 		registeViewContainer(context);
@@ -41,25 +41,13 @@ function registeCommand(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(textDecorationDisposable);
 
-	let acceptLineChangeDisposable = vscode.commands.registerCommand('deep-ai.acceptLineChange', (line: number, changeContext: ChangeContext) => {
-		vscode.window.showInformationMessage('decoration get text');
-		EditorService.dealChange(line, true, changeContext);
-	});
-	context.subscriptions.push(acceptLineChangeDisposable);
-
-	let rejectLineChangeDisposable = vscode.commands.registerCommand('deep-ai.rejectLineChange', (line: number, changeContext: ChangeContext) => {
-		vscode.window.showInformationMessage('decoration get text');
-		EditorService.dealChange(line, false, changeContext);
-
-	});
-	context.subscriptions.push(rejectLineChangeDisposable);
 }
 function registeViewContainer(context: vscode.ExtensionContext) {
 	provider = new ChatViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider("deep-ai-view", provider));
 	VsCodeEventService.setChatViewProvider(provider);
 }
-
+123
 
 function registeEvent(context: vscode.ExtensionContext) {
 	EditorService.init();
@@ -75,7 +63,7 @@ function registeEvent(context: vscode.ExtensionContext) {
 				}
 				if (fileName === "") {
 					return;
-				}
+				}123
 				let event = new ChangeVisibleTextEditorsEvent();
 				event.injectData(fileName, fileText);
 				// !!!// event.injectData(vscode.window.visibleTextEditors.map((editor) => {
@@ -123,5 +111,7 @@ function registeCodeLens(context: vscode.ExtensionContext) {
 
 function initConfig(context: vscode.ExtensionContext) {
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
+	ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	ExtensionEnv.extensionPath = context.extensionPath;
 }
 

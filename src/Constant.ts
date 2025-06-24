@@ -1,4 +1,9 @@
 
+export class ExtensionEnv {
+    public static isProduction: boolean | null = null;
+    public static extensionPath: string | null = null;
+}
+
 export class DeepAiEvent {
     public name: string = "";
     public from: string = "";// vscode|react

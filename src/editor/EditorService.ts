@@ -8,6 +8,8 @@ import { Uri } from 'vscode';
 import { Base64 } from 'js-base64';
 import EditorUtils from './EditorUtils';
 import { ChangeContext, ChangeInfo } from './EditorConstant';
+import { DiffViewManager } from './DiffViewManager';
+import { DiffWebview } from '../diff/DiffWebview';
 
 
 // 高亮显示要修改的行
@@ -55,8 +57,8 @@ class EditorService {
 
         // 写入文件并刷新视图
         vscode.workspace.fs.writeFile(changeContext.originalUri, Buffer.from(content.join('\n')));
-        
-        
+
+
         vscode.commands.executeCommand("workbench.action.closeActiveEditor");
         vscode.window.showTextDocument(changeContext.originalUri);
     }
@@ -213,26 +215,26 @@ class EditorService {
                 const filePath = document.uri.fsPath;
                 const originalContent = document.getText();
 
+                DiffWebview.show()
+                // // 创建虚拟文档URI
+                // let type = EditorService.getFileExtension(document.uri.path);
+                // const virtualUri = document.uri.with({
+                //     scheme: 'deep-ai-diff',
+                //     path: document.uri.path + '.modified' + Date.now() + (type === "" ? "" : "." + type),
+                //     query: `original=${encodeURIComponent(document.uri.toString())}`
+                // });
 
-                // 创建虚拟文档URI
-                let type = EditorService.getFileExtension(document.uri.path);
-                const virtualUri = document.uri.with({
-                    scheme: 'deep-ai-diff',
-                    path: document.uri.path + '.modified' + Date.now() + (type === "" ? "" : "." + type),
-                    query: `original=${encodeURIComponent(document.uri.toString())}`
-                });
 
 
-
-                // 打开diff视图
-                vscode.commands.executeCommand('vscode.diff',
-                    document.uri,
-                    virtualUri,
-                    `比较: ${path.basename(filePath)}`
-                ).then(() => {
-                    EditorService.addDiffCodeLenses(document.uri, originalContent,
-                        virtualUri, EditorService.modifiedContent);
-                });
+                // // 打开diff视图
+                // vscode.commands.executeCommand('vscode.diff',
+                //     document.uri,
+                //     virtualUri,
+                //     `比较: ${path.basename(filePath)}`
+                // ).then(() => {
+                //     EditorService.addDiffCodeLenses(document.uri, originalContent,
+                //         virtualUri, EditorService.modifiedContent);
+                // });
 
 
             }
