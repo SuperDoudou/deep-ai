@@ -1,21 +1,23 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { ExtensionEnv } from '../Constant';
+import { Base64 } from 'js-base64';
 
 export class DiffWebview {
 
-    private static async getHtml(webview: vscode.Webview): Promise<string> {
+    private static async getHtml(webview: vscode.Webview, filePath: string, originalContent: string, modifiedContent: string): Promise<string> {
+
 
         let isProduction = ExtensionEnv.isProduction === true;
 
         let srcUrl = '';
         let jsUrl = '';
         let webviewInitUrl = '';
-        const filePath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist', 'static/js/main.js'));
-        const webviewInitPath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist/webview', 'webview_init.js'));
+        const extensionFilePath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist', 'static/js/main.js'));
+        const webviewInitPath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist/diff/webview', 'webview_init.js'));
         webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
         if (isProduction) {
-            jsUrl = webview.asWebviewUri(filePath).toString();
+            jsUrl = webview.asWebviewUri(extensionFilePath).toString();
         } else {
             srcUrl = 'http://localhost:3001';
             // srcUrl = panel.webview.asWebviewUri(filePath).toString();
@@ -31,9 +33,9 @@ export class DiffWebview {
 		<script defer="defer" src="${webviewInitUrl}"></script>
 	</head>
 	<body style="height:95%">
-		<div id="root"></div>
+		<div id="root" filePath="${filePath}" originalContent="${originalContent}" modifiedContent="${modifiedContent}" ></div>
 		<iframe
-			id="webview-patch-iframe"
+			id="webview-diff-iframe"
 			frameborder="0"
 			sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"
 			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
@@ -44,10 +46,14 @@ export class DiffWebview {
   </html>`;
     }
 
-    public static show(context: vscode.ExtensionContext) {
+    public static show(filePath: string, originalContent: string, modifiedContent: string) {
+        let showFilePath = filePath
+        originalContent = Buffer.from(originalContent).toString('base64');
+        modifiedContent = Buffer.from(modifiedContent).toString('base64');
+        filePath = Buffer.from(filePath).toString('base64');
         const panel = vscode.window.createWebviewPanel(
             'monacoWebview',
-            'Monaco Editor',
+            'preview:' + showFilePath,
             vscode.ViewColumn.One,
             {
                 enableScripts: true,
@@ -58,7 +64,8 @@ export class DiffWebview {
             }
         );
 
-        this.getHtml(panel.webview).then(html => {
+        this.getHtml(panel.webview, filePath, originalContent, modifiedContent).then(html => {
+
             panel.webview.html = html;
         });
 

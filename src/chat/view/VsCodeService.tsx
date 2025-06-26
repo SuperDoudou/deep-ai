@@ -1,4 +1,4 @@
-import { AcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent } from "../Constant";
+import { AcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent } from "../../Constant";
 import AppMessage from "./AppMessage";
 
 class VsCodeService {

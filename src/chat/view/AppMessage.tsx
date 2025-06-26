@@ -3,7 +3,7 @@ import "./App.css"
 import InputArea from './chat/InputArea';
 import ChatItem from './chat/ChatItem';
 import ChatContainer from './chat/ChatItemContainer';
-import { DeepAiEvent } from '../Constant';
+import { DeepAiEvent } from '../../Constantant';
 import { fromBase64 } from 'js-base64';
 
 

@@ -49,8 +49,14 @@ const extensionConfig = {
     new CopyPlugin({
       patterns: [
         {
-          from: 'src/webview/webview_init.js',
-          to: path.resolve(__dirname, 'dist/webview'),
+          from: 'src/chat/webview/webview_init.js',
+          to: path.resolve(__dirname, 'dist/chat/webview'),
+          // 可选：不写入webpack的assets列表
+          info: { minimized: true }
+        },
+        {
+          from: 'src/diff/webview_init.js',
+          to: path.resolve(__dirname, 'dist/diff/webview'),
           // 可选：不写入webpack的assets列表
           info: { minimized: true }
         }

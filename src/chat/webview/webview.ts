@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
-import { DeepAiEvent, ExtensionEnv } from '../Constant';
-import VsCodeEventService from '../VsCodeEventService';
+import { DeepAiEvent, ExtensionEnv } from '../../Constant';
+import VsCodeEventService from '../../VsCodeEventService';
 
 type InnerMessage = {
 	from: string; // extension|webview|react
@@ -65,7 +65,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 	let jsUrl = '';
 	let webviewInitUrl = '';
 	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist', 'static/js/main.js'));
-	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/webview', 'webview_init.js'));
+	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/chat/webview', 'webview_init.js'));
 	if (webview) {
 		webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
 	}

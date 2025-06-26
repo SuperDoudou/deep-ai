@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import AppMessage from '../AppMessage';
-import { ChangeVisibleTextEditorsEvent } from '../../Constant';
 import { JSX } from 'react/jsx-runtime';
+import { ChangeVisibleTextEditorsEvent } from '../../../Constant';
 
 export interface ContextAreaInfo {
     fileName: string;

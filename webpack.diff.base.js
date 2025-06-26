@@ -1,10 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const { type } = require('os');
 const { use } = require('react');
 
 module.exports = {
-  entry: path.join(__dirname, './src/view/index.tsx'), // 入口文件
+  entry: path.join(__dirname, './src/diff/view/index.tsx'), // 入口文件
   output: {
     filename: 'static/js/[name].js',
     path: path.join(__dirname, './dist_react'),
@@ -42,8 +43,9 @@ module.exports = {
     extensions: ['.js', '.tsx', '.ts', '.css'],
   },
   plugins: [
+    new MonacoWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, './src/view/index.html'),
+      template: path.resolve(__dirname, './src/diff/view/index.html'),
       inject: true, // 自动注入静态资源
     }),
   ],

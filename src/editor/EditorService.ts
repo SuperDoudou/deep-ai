@@ -215,7 +215,7 @@ class EditorService {
                 const filePath = document.uri.fsPath;
                 const originalContent = document.getText();
 
-                DiffWebview.show()
+                DiffWebview.show(document.uri.path, originalContent, EditorService.modifiedContent);
                 // // 创建虚拟文档URI
                 // let type = EditorService.getFileExtension(document.uri.path);
                 // const virtualUri = document.uri.with({

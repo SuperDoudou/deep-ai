@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import InputArea from './InputArea';
 import ChatItem from './ChatItem';
-import svg from '../../resources/robot.svg'
+import svg from '../../../resources/robot.svg'
 import App from '../App';
 import AppMessage from '../AppMessage';
 import LLMService from './LLMService';

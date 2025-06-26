@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
-import ChatViewProvider from './webview/webview';
+import ChatViewProvider from './chat/webview/webview';
 import EditorDecoration from './editor/EditorDecoration';
 import LineActionCodeLensProvider from './editor/LineActionCodeLensProvider';
 import EditorService from './editor/EditorService';

@@ -1,5 +1,5 @@
 import { DeepAiEvent } from "./Constant";
-import ChatViewProvider from "./webview/webview";
+import ChatViewProvider from "./chat/webview/webview";
 
 class VsCodeEventService {
 

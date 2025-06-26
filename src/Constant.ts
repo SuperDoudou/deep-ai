@@ -23,6 +23,9 @@ export class DeepAiEvent {
         if (name === "acceptVisibleTextEditors") {
             e = new AcceptCurrentEditorTextEvent();
         }
+        if (name === "initDiff") {
+            e = new InitDiffEvent();
+        }
         e.data = data;
         return e;
     }
@@ -54,16 +57,17 @@ export class AcceptCurrentEditorTextEvent implements DeepAiEvent {
     from: string = "react";
     description: string = "webview 向 vscode 接受当前文本所有改动";
     data: string = "";
-    injectData: (filePath: string,) => void =
-        (filePath: string,) => {
+    injectData: (filePath: string, fileText: string) => void =
+        (filePath: string, fileText: string) => {
             this.data = JSON.stringify({
                 filePath,
             });
         };
-    resolveData: () => { filePath: string } =
+    resolveData: () => { filePath: string, fileText: string } =
         () => {
             return JSON.parse(this.data) as {
                 filePath: string,
+                fileText: string
             };
         };
 }
@@ -81,6 +85,25 @@ export class ChangeVisibleTextEditorsEvent implements DeepAiEvent {
             });
         };
     resolveData: () => { filePath: string, fileText: string } =
+        () => {
+            return JSON.parse(this.data);
+        };
+}
+
+export class InitDiffEvent implements DeepAiEvent {
+    name: string = "initDiff";
+    from: string = "vscode";
+    description: string = "vscode 向 diff webview 发送当前编辑器文本";
+    data: string = "";
+    injectData: (filePath: string, originalContent: string, modifiedContent: string) => void =
+        (filePath: string, originalContent: string, modifiedContent: string) => {
+            this.data = JSON.stringify({
+                filePath,
+                originalContent,
+                modifiedContent,
+            });
+        };
+    resolveData: () => { filePath: string, originalContent: string, modifiedContent: string } =
         () => {
             return JSON.parse(this.data);
         };
