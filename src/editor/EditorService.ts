@@ -208,9 +208,9 @@ class EditorService {
                     vscode.window.showErrorMessage('没有活动的文本编辑器');
                     return;
                 }
-                data.fileText = Base64.decode("ewogICJjb21waWxlck9wdGlvbnMiOiB7CiAgICAibW9kdWxlIjogIk5vZGUxNiIsCiAgICAidGFyZ2V0IjogIkVTMjAyMiIsCiAgICAibGliIjogWyJFUzIwMjIiLCAiRE9NIiwgIkRPTS5JdGVyYWJsZSJdLAogICAgInNvdXJjZU1hcCI6IHRydWUsCiAgICAicm9vdERpciI6ICJzcmMiLAogICAgImpzeCI6ICJyZWFjdCIsCiAgICAic3RyaWN0IjogdHJ1ZSwKICAgICJub0ltcGxpY2l0UmV0dXJucyI6IHRydWUsCiAgICAibm9GYWxsdGhyb3VnaENhc2VzSW5Td2l0Y2giOiB0cnVlLAogICAgIm5vVW51c2VkUGFyYW1ldGVycyI6IHRydWUsCiAgICAib3V0RGlyIjogIi4vZGlzdCIsCiAgICAiYmFzZVVybCI6ICIuIiwKICAgICJwYXRocyI6IHsKICAgICAgIkAvKiI6IFsic3JjLyoiXQogICAgfSwKICAgICJlc01vZHVsZUludGVyb3AiOiB0cnVlLAogICAgInNraXBMaWJDaGVjayI6IHRydWUsCiAgICAiZm9yY2VDb25zaXN0ZW50Q2FzaW5nSW5GaWxlTmFtZXMiOiB0cnVlLAogICAgInN0cmljdE51bGxDaGVja3MiOiB0cnVlLAogICAgIm1vZHVsZVJlc29sdXRpb24iOiAiTm9kZU5leHQiLAogICAgInJlc29sdmVKc29uTW9kdWxlIjogdHJ1ZSwKICAgICJpc29sYXRlZE1vZHVsZXMiOiB0cnVlLAogICAgIm5vRW1pdE9uRXJyb3IiOiB0cnVlLAogICAgImluY3JlbWVudGFsIjogdHJ1ZSwKICAgICJ0c0J1aWxkSW5mb0ZpbGUiOiAic3JjLy50c2J1aWxkaW5mbyIKICB9LAogICJpbmNsdWRlIjogWyJzcmMvKiovKiJdLAogICJleGNsdWRlIjogWyJub2RlX21vZHVsZXMiXSwKICAiZXh0ZW5kcyI6ICIuL25vZGVfbW9kdWxlcy9AdHlwZXMvbm9kZS90c2NvbmZpZy5qc29uIgp9")
-                EditorService.modifiedContent = EditorUtils.changeModifyFileIndentation(editor, data.fileText);
-
+                // data.fileText = Base64.decode("ewogICJjb21waWxlck9wdGlvbnMiOiB7CiAgICAibW9kdWxlIjogIk5vZGUxNiIsCiAgICAidGFyZ2V0IjogIkVTMjAyMiIsCiAgICAibGliIjogWyJFUzIwMjIiLCAiRE9NIiwgIkRPTS5JdGVyYWJsZSJdLAogICAgInNvdXJjZU1hcCI6IHRydWUsCiAgICAicm9vdERpciI6ICJzcmMiLAogICAgImpzeCI6ICJyZWFjdCIsCiAgICAic3RyaWN0IjogdHJ1ZSwKICAgICJub0ltcGxpY2l0UmV0dXJucyI6IHRydWUsCiAgICAibm9GYWxsdGhyb3VnaENhc2VzSW5Td2l0Y2giOiB0cnVlLAogICAgIm5vVW51c2VkUGFyYW1ldGVycyI6IHRydWUsCiAgICAib3V0RGlyIjogIi4vZGlzdCIsCiAgICAiYmFzZVVybCI6ICIuIiwKICAgICJwYXRocyI6IHsKICAgICAgIkAvKiI6IFsic3JjLyoiXQogICAgfSwKICAgICJlc01vZHVsZUludGVyb3AiOiB0cnVlLAogICAgInNraXBMaWJDaGVjayI6IHRydWUsCiAgICAiZm9yY2VDb25zaXN0ZW50Q2FzaW5nSW5GaWxlTmFtZXMiOiB0cnVlLAogICAgInN0cmljdE51bGxDaGVja3MiOiB0cnVlLAogICAgIm1vZHVsZVJlc29sdXRpb24iOiAiTm9kZU5leHQiLAogICAgInJlc29sdmVKc29uTW9kdWxlIjogdHJ1ZSwKICAgICJpc29sYXRlZE1vZHVsZXMiOiB0cnVlLAogICAgIm5vRW1pdE9uRXJyb3IiOiB0cnVlLAogICAgImluY3JlbWVudGFsIjogdHJ1ZSwKICAgICJ0c0J1aWxkSW5mb0ZpbGUiOiAic3JjLy50c2J1aWxkaW5mbyIKICB9LAogICJpbmNsdWRlIjogWyJzcmMvKiovKiJdLAogICJleGNsdWRlIjogWyJub2RlX21vZHVsZXMiXSwKICAiZXh0ZW5kcyI6ICIuL25vZGVfbW9kdWxlcy9AdHlwZXMvbm9kZS90c2NvbmZpZy5qc29uIgp9")
+                // EditorService.modifiedContent = EditorUtils.changeModifyFileIndentation(editor, data.fileText);
+                EditorService.modifiedContent = data.fileText;
                 const document = editor.document;
                 const filePath = document.uri.fsPath;
                 const originalContent = document.getText();
@@ -240,19 +240,15 @@ class EditorService {
             }
         );
 
-        let acceptCurrentEditorText = new AcceptCurrentEditorTextEvent();
-        VsCodeEventService.registerEvent(acceptCurrentEditorText.name,
+        VsCodeEventService.registerEvent(new AcceptCurrentEditorTextEvent().name,
             (messageEvent) => {
                 let event: AcceptCurrentEditorTextEvent = DeepAiEvent.fromEventName(messageEvent.name, messageEvent.data);
-
-                const editor = vscode.window.activeTextEditor?.document;
-                if (editor?.uri.scheme !== "deep-ai-diff") {
-                    return;
-                }
-                let originUri = Uri.parse(new URLSearchParams(editor.uri.query).get('original') || '');
-                vscode.workspace.fs.writeFile(originUri, Buffer.from(EditorService.modifiedContent));
-                vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-                // vscode.workspace.openTextDocument(originUri);
+                let { filePath, fileText } = event.resolveData();
+                //
+                let filePathUri = vscode.Uri.file(filePath);
+                vscode.workspace.fs.writeFile(filePathUri, Buffer.from(fileText));
+                DiffWebview.disposeAll();
+                vscode.workspace.openTextDocument(filePath);
             }
         );
     }

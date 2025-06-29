@@ -14,11 +14,12 @@ const testHelloString = "YGBganNvbgp7CgkiY29tcGlsZXJPcHRpb25zIjogewoJCSJtb2R1bGU
 
 
 class MessageItem {
-    public name: string = "";
-    public isRobot: boolean = true;
-    public avatar: string = "";
-    public message: string = "";
-    public reasoningContent: string = "";
+    public name: string = ""; // 对话的用户昵称
+    public isRobot: boolean = true; // 是否是机器人
+    public avatar: string = ""; // 对话的用户头像
+    public message: string = ""; // 对话的消息内容
+    public reasoningContent: string = ""; // 对话的思考内容
+    public status: "init" | "answering" | "stop" | "finish" = "init"; // 对话的状态
     public setMessage = (message: string) => {
         this.message = message;
     };
@@ -82,17 +83,22 @@ function ChatContainer() {
         pushMessagesList(messageItem)
 
         let answerMessageItem = new MessageItem(mockUser.name, true, mockUser.avatar, "", "")
+        answerMessageItem.status = "answering"
         pushMessagesList(answerMessageItem)
         LLMService.sendText(message, contextAreaInfo,
-            (m) => {
-                answerMessageItem.setReasoningContent(m);
-                setCount(count => count + 1)
-            },
-            (m) => {
-                answerMessageItem.setMessage(m);
+            (reasoningContent, answerContent) => {
+                if (answerMessageItem.status === "stop") {
+                    return
+                }
+                answerMessageItem.setReasoningContent(reasoningContent);
+                answerMessageItem.setMessage(answerContent);
                 setCount(count => count + 1)
             })
+    }
 
+
+    function onStopSendingMessage(): void {
+        messagesList[messagesList.length - 1].status = "stop"
     }
 
     const mockUser = { name: '企鵝豆豆', avatar: Utils.svgToDataURL(svg) }
@@ -102,6 +108,7 @@ function ChatContainer() {
         new MessageItem('用户1', true, Utils.svgToDataURL(svg), '你好，这是第一条消息', '这是第一条消息的思考过程'),
         new MessageItem('用户2', true, Utils.svgToDataURL(svg), '今天的会议安排如何？', '这是第一条消息的思考过程222'),
     ]
+
 
 
     return (
@@ -118,7 +125,8 @@ function ChatContainer() {
                         </ChatItem>
                     ))}
                 </div>
-                <InputArea onSendMessage={onInputMessage}></InputArea>
+                <InputArea onSendMessage={onInputMessage} onStopSendingMessage={onStopSendingMessage}
+                ></InputArea>
             </div>
 
         </>

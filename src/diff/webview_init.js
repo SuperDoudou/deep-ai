@@ -19,7 +19,7 @@ window.addEventListener('message', event => {
         data: event.data.data // 数据，如：文件名
     };
 
-    console.log("[webview html] revieve event from " + event.data.from + " message:" + JSON.stringify(message));
+    console.log("[diff webview html] revieve event from " + event.data.from + " message:" + JSON.stringify(message));
     if (event.data.from.startsWith("vscode")) {
         if (iframe) {
             iframe.contentWindow.postMessage(message, "http://localhost:3001");

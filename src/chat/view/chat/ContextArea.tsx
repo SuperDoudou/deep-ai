@@ -43,7 +43,13 @@ export const ContextArea = forwardRef((props, ref) => {
 
     return (
         <div id="chat-context-area">
-            #{fileName}
+            <div className='chat-context-area-file'>
+                <div style={{
+                    paddingRight: "2px",
+                    color: "rgb(168, 255, 96)",
+                }}>#</div>
+                {fileName}
+            </div>
         </div>
     );
 });

@@ -20,7 +20,7 @@ export class DeepAiEvent {
         if (name === "changeVisibleTextEditors") {
             e = new ChangeVisibleTextEditorsEvent();
         }
-        if (name === "acceptVisibleTextEditors") {
+        if (name === "acceptCurrentEditorText") {
             e = new AcceptCurrentEditorTextEvent();
         }
         if (name === "initDiff") {
@@ -61,6 +61,7 @@ export class AcceptCurrentEditorTextEvent implements DeepAiEvent {
         (filePath: string, fileText: string) => {
             this.data = JSON.stringify({
                 filePath,
+                fileText
             });
         };
     resolveData: () => { filePath: string, fileText: string } =

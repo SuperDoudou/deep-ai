@@ -31,7 +31,7 @@ function DiffViewer(props: { filePath: string, originalContent: string, modified
 
     let handleAcceptAll = () => {
         let event = new AcceptCurrentEditorTextEvent()
-        
+        event.injectData(props.filePath, diffEditor?.getModel()?.modified?.getValue() || "")
         // event.injectData(diffEditor?.getModel()?.modified)
         AppMessage.sendMessage(event)
     }
@@ -43,8 +43,13 @@ function DiffViewer(props: { filePath: string, originalContent: string, modified
             paddingTop: '40px',
             flexDirection: 'column',
         }}>
-            <div onClick={handleAcceptAll}>
-                ✅采纳全部
+            <div style={
+                {
+                    cursor: 'pointer',
+                }
+            }
+                onClick={handleAcceptAll}>
+                ✅确认修改
             </div>
             <div>{props.filePath}</div>
             <div id="diff_editor" ref={editorRef} style={{ height: '90vh', width: '100%' }} />

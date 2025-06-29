@@ -87,19 +87,90 @@ textarea {
 
 #chat_input_part {
     box-sizing: border-box;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
     text-align: center;
-    padding: 0px;
+    margin-top: 20px;
+    padding: 5px;
+    background-color: rgb(32, 32, 32);
     width: 100%;
 }
 
+.chat_input_area_action_icon {
+    width: 16px;
+    margin-right: 5px;
+}
 
+.chat_input_area_model_icon {
+    width: 14px;
+    margin-right: 5px;
+}
+
+#chat_input_area_model_select {
+    height: 18px;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
+    background-color: rgb(77, 77, 77);
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#chat_input_part:focus-within {
+    border-color: #7d96db;
+    /* 聚焦时边框变绿色 */
+    box-shadow: 0 0 0 2px rgba(136, 169, 212, 0.2);
+    /* 可选：轻微发光 */
+}
+
+.chat-context-area-file {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    /* 加重 */
+    font-weight: bold;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
+    background-color: rgb(77, 77, 77);
+    height: 18px;
+    align-items: center;
+}
+
+#chat-context-area {
+    margin-left: 5px;
+}
 
 #chat_input_area {
     box-sizing: border-box;
     padding: 3px;
     margin: 0px;
-    height: 150px;
+    resize: none;
+    height: 120px;
+    border-width: 0px;
+    background-color: rgb(32, 32, 32);
     width: calc(100% - 10px);
+}
+
+#chat_input_area_action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+#chat_input_area_action_right {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+#chat_input_area:focus {
+    outline: none;
 }
 
 #chat_input_button {

@@ -2,12 +2,18 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { ExtensionEnv } from '../Constant';
 import { Base64 } from 'js-base64';
+import VsCodeEventService from '../VsCodeEventService';
 
 export class DiffWebview {
 
+    private static panels: vscode.WebviewPanel[] = [];
+    public static disposeAll() {
+        for (let panel of this.panels) {
+            panel.dispose();
+        }
+    }
+
     private static async getHtml(webview: vscode.Webview, filePath: string, originalContent: string, modifiedContent: string): Promise<string> {
-
-
         let isProduction = ExtensionEnv.isProduction === true;
 
         let srcUrl = '';
@@ -63,7 +69,7 @@ export class DiffWebview {
                 // ]
             }
         );
-
+        this.panels.push(panel);
         this.getHtml(panel.webview, filePath, originalContent, modifiedContent).then(html => {
 
             panel.webview.html = html;
@@ -71,11 +77,7 @@ export class DiffWebview {
 
         // 处理从Webview发送的消息
         panel.webview.onDidReceiveMessage(message => {
-            switch (message.command) {
-                case 'contentChange':
-                    vscode.window.showInformationMessage(`Content changed: ${message.text.length} chars`);
-                    break;
-            }
+            VsCodeEventService.onEvent(message);
         });
     }
 }
