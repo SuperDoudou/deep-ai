@@ -42,7 +42,7 @@ if (iframe) {
     iframe.onload = function () {
         const data = {
             name: 'initChat',
-            data: initData),
+            data: initData,
         };
         console.log(`[diff] post message to react, ${data.name}, ${data.data}`);
         iframe.contentWindow.postMessage(data, '*'); // 最好指定具体origin而不是'*'

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { createContext } from 'react';
 import VsCodeService from "./VsCodeService";
+import AppMessage from "./AppMessage";
+import { InitChatEvent } from "../../Constant";
 
 export interface ModelItem {
   baseUrl: string;
@@ -31,7 +33,20 @@ function GlobalStateProvider({ children }: { children: any }) {
   useEffect(() => {
     VsCodeService.updateModel(state.modelList)
   }, [state.modelList])
-  
+
+  useEffect(() => {
+    let event = new InitChatEvent()
+    AppMessage.addEventListener(event.name, (data) => {
+      event.data = data
+      let { initData } = event.resolveData()
+      console.log(initData)
+
+      setState({
+        ...state,
+        modelList: initData.modelList,
+      })
+    })
+  }, [])
   // 可以在这里定义要共享的值
   const value = {
     state,

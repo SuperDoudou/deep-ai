@@ -30,6 +30,7 @@ class VsCodeStorageService {
     }
 
     public static SetChatWebviewInitData(data: WebviewInitData) {
+        console.log(data)
         this._context.globalState.update(this.chatInitDataKey, JSON.stringify(data));
     }
 
