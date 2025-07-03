@@ -4,12 +4,6 @@ import { register } from 'node:module';
 import { DeepAiEvent, ExtensionEnv } from '../../Constant';
 import VsCodeEventService from '../../VsCodeEventService';
 
-type InnerMessage = {
-	from: string; // extension|webview|react
-	eventName: string; // 事件名称，如：getCurrentFileName
-	data: string; // 数据，如：文件名
-};
-
 
 class ChatViewProvider implements vscode.WebviewViewProvider {
 

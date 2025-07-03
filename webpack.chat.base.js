@@ -4,7 +4,7 @@ const { type } = require('os');
 const { use } = require('react');
 
 module.exports = {
-  entry: path.join(__dirname, './src/chat/view/index.tsx'), // 入口文件
+  entry: path.join(__dirname, './src/chat/app/index.tsx'), // 入口文件
 
   output: {
     filename: 'static/js/[name].js',
@@ -44,7 +44,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, './src/chat/view/index.html'),
+      template: path.resolve(__dirname, './src/chat/app/index.html'),
       inject: true, // 自动注入静态资源
     }),
   ],

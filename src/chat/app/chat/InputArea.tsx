@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ContextArea, ContextAreaInfo } from './ContextArea';
 import AppMessage from '../AppMessage';
 import Utils from '../Utils';
+import ModelSelector from './ModelSelector';
+import { GlobalAppContext } from '../GlobalStateProvider';
 
 
 const sendIcon = '<svg t="1750988574088" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11649" width="32" height="32"><path d="M915.515273 142.819385 98.213046 458.199122c-46.058539 17.772838-44.90475 43.601756 2.348455 57.622994l197.477685 58.594874 80.292024 238.91085c10.51184 31.277988 37.972822 37.873693 61.462483 14.603752l103.584447-102.611545 204.475018 149.840224c26.565749 19.467242 53.878547 9.222132 61.049613-23.090076l149.210699-672.34491C965.264096 147.505054 946.218922 130.971848 915.515273 142.819385zM791.141174 294.834331l-348.61988 310.610267c-6.268679 5.58499-11.941557 16.652774-12.812263 24.846818l-15.390659 144.697741c-1.728128 16.24808-7.330491 16.918483-12.497501 1.344894l-67.457277-203.338603c-2.638691-7.954906 0.975968-17.705389 8.022355-21.931178l442.114555-265.181253C812.67481 268.984974 815.674251 272.975713 791.141174 294.834331z" p-id="11650" fill="#bfbfbf"></path></svg>'
@@ -18,6 +20,14 @@ function InputArea(
     const [inputMessage, setInputMessage] = useState('');
     const [sendingMessage, setSendingMessage] = useState(false);
     const contextAreaRef = useRef<typeof ContextArea>(null);
+    const [modelSelector, setModelSelector] = useState(false);
+    const appContext = useContext(GlobalAppContext);
+
+    const modelSelectRef = useRef<HTMLDivElement>(null);
+    const [modelSelectorPosition, setModelSelectorPosition] = useState<{
+        top: number;
+        right: number
+    } | null>(null);
 
     const handleInputChange = (e: any) => {
         let data = e.target.value;
@@ -35,6 +45,18 @@ function InputArea(
     const stopSending = () => {
         setSendingMessage(false);
         onStopSendingMessage()
+    }
+
+    const selectModel = () => {
+        setModelSelector(true);
+        if (modelSelectRef.current) {
+            const rect = modelSelectRef.current.getBoundingClientRect();
+            setModelSelectorPosition({
+                top: window.innerHeight - rect.top,
+                right: window.innerWidth - rect.right
+            });
+        }
+        console.log('selectModel');
     }
 
     const handleInputSend = (e: any) => {
@@ -67,12 +89,25 @@ function InputArea(
                     <ContextArea ref={contextAreaRef}></ContextArea>
                 </div>
                 <div id="chat_input_area_action_right">
-                    <div id="chat_input_area_model_select">
+                    {modelSelector && (
+                        <div style={{
+                            position: "absolute",
+                            bottom: modelSelectorPosition?.top,
+                            right: modelSelectorPosition?.right,
+                            zIndex: 1000
+                        }}>
+                            <ModelSelector onCloseSelector={() => setModelSelector(false)}></ModelSelector>
+                        </div>
+                    )}
+                    <div id="chat_input_area_model_select" onClick={selectModel} ref={modelSelectRef}>
                         <img className="chat_input_area_model_icon"
                             src={Utils.svgToDataURL(modelIcon)}
                             title='模型'
-                            onClick={stopSending}></img>
-                        <div>deepseek</div>
+                        ></img>
+                        <div>
+                            {appContext.modelList.filter((item) => item.selected)
+                            .map((item) => item.modelName) || "no model"}
+                            </div>
                     </div>
                     {
                         sendingMessage ?
