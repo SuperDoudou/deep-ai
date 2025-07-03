@@ -37,6 +37,16 @@ window.addEventListener('message', event => {
 });
 
 if (iframe) {
+    const root = document.getElementById('root');
+    const initData = root?.getAttribute('initdata') || "";
+    iframe.onload = function () {
+        const data = {
+            name: 'initChat',
+            data: initData),
+        };
+        console.log(`[diff] post message to react, ${data.name}, ${data.data}`);
+        iframe.contentWindow.postMessage(data, '*'); // 最好指定具体origin而不是'*'
+    };
     // f: HTMLElement = iframe
     // f.onload(() => {
     // message = Array.from(document.styleSheets)

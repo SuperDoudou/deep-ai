@@ -3,23 +3,29 @@ import path from 'node:path';
 import { register } from 'node:module';
 import { DeepAiEvent, ExtensionEnv } from '../../Constant';
 import VsCodeEventService from '../../VsCodeEventService';
+import { ModelItem } from '../app/GlobalStateProvider';
 
+export interface WebviewInitData {
+	modelList: ModelItem[]
+}
 
 class ChatViewProvider implements vscode.WebviewViewProvider {
 
 	private _context: vscode.ExtensionContext;
 	private _view?: vscode.WebviewView;
+	private _initData: WebviewInitData;
 
 	public getView() {
 		return this._view;
 	}
-	constructor(private context: vscode.ExtensionContext) {
+	constructor(private context: vscode.ExtensionContext, private initData: WebviewInitData) {
 		this._context = context;
+		this._initData = initData;
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
 
-		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview);
+		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview, this._initData);
 		webviewView.webview.options = {
 			enableScripts: true
 		};
@@ -53,11 +59,12 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 }
 
 
-function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null) {
+function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null, initData: WebviewInitData) {
 	let isProduction = ExtensionEnv.isProduction === true;
 	let srcUrl = '';
 	let jsUrl = '';
 	let webviewInitUrl = '';
+	let initDataBase64 = Buffer.from(JSON.stringify(initData)).toString('base64');
 	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist', 'static/js/main.js'));
 	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/chat/webview', 'webview_init.js'));
 	if (webview) {
@@ -92,7 +99,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 		<script defer="defer" src="${webviewInitUrl}"></script>
 	</head>
 	<body style="height:95%">
-		<div id="root"></div>
+		<div id="root" initdata="${initDataBase64}"></div>
 		<iframe
 			id="webview-patch-iframe"
 			frameborder="0"

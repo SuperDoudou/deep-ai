@@ -1,3 +1,4 @@
+import { ModelItem } from "./chat/app/GlobalStateProvider";
 
 export class ExtensionEnv {
     public static isProduction: boolean | null = null;
@@ -25,6 +26,9 @@ export class DeepAiEvent {
         }
         if (name === "initDiff") {
             e = new InitDiffEvent();
+        }
+        if (name === "updateModel") {
+            e = new UpdateModelEvent();
         }
         e.data = data;
         return e;
@@ -105,6 +109,21 @@ export class InitDiffEvent implements DeepAiEvent {
             });
         };
     resolveData: () => { filePath: string, originalContent: string, modifiedContent: string } =
+        () => {
+            return JSON.parse(this.data);
+        };
+}
+
+export class UpdateModelEvent implements DeepAiEvent {
+    name: string = "updateModel";
+    from: string = "chat";
+    description: string = "chat webview 向 vscode 发送当前模型";
+    data: string = "";
+    injectData: (models: ModelItem[]) => void =
+        (models: ModelItem[]) => {
+            this.data = JSON.stringify(models);
+        };
+    resolveData: () => ModelItem[] =
         () => {
             return JSON.parse(this.data);
         };

@@ -53,7 +53,7 @@ export class DiffWebview {
     }
 
     public static show(filePath: string, originalContent: string, modifiedContent: string) {
-        let showFilePath = filePath
+        let showFilePath = filePath;
         originalContent = Buffer.from(originalContent).toString('base64');
         modifiedContent = Buffer.from(modifiedContent).toString('base64');
         filePath = Buffer.from(filePath).toString('base64');

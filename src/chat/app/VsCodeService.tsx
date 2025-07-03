@@ -1,5 +1,6 @@
-import { AcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent } from "../../Constant";
+import { AcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent, UpdateModelEvent } from "../../Constant";
 import AppMessage from "./AppMessage";
+import { ModelItem } from "./GlobalStateProvider";
 
 class VsCodeService {
 
@@ -11,8 +12,13 @@ class VsCodeService {
 
     public static acceptTextEditor(filePath: string) {
         let event = new AcceptCurrentEditorTextEvent()
-        event.injectData("")
+        // event.injectData("")
         AppMessage.sendMessage(event)
+    }
+
+    public static updateModel(modelItems: ModelItem[]){
+        let event = new UpdateModelEvent()
+        event.injectData(modelItems)
     }
 }
 export default VsCodeService;

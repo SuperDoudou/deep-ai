@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createContext } from 'react';
+import VsCodeService from "./VsCodeService";
 
-interface ModelItem {
+export interface ModelItem {
   baseUrl: string;
   apiKey: string;
   modelName: string;
@@ -12,14 +13,7 @@ interface GlobalContext {
 }
 // 创建一个 Context 对象
 export const GlobalAppContext = createContext<GlobalContext>({
-  modelList: [
-    {
-      baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-      apikey: 'sk-528b8213b23f4f00b7ac836652985ee1',
-      modelName: 'deepseek-r1-distill-llama-70b',
-      selected: true,
-    },
-  ],
+  modelList: [],
 });
 
 function GlobalStateProvider({ children }: { children: any }) {
@@ -27,13 +21,17 @@ function GlobalStateProvider({ children }: { children: any }) {
     modelList: [
       {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-        apikey: 'sk-528b8213b23f4f00b7ac836652985ee1',
+        apiKey: 'sk-528b8213b23f4f00b7ac836652985ee1',
         modelName: 'deepseek-r1-distill-llama-70b',
         selected: true,
       },
     ],
   });
 
+  useEffect(() => {
+    VsCodeService.updateModel(state.modelList)
+  }, [state.modelList])
+  
   // 可以在这里定义要共享的值
   const value = {
     state,
