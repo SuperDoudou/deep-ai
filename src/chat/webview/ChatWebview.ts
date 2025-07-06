@@ -1,34 +1,41 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
-import { DeepAiEvent } from '../Constant';
-import VsCodeEventService from '../VsCodeEventService';
+import { DeepAiEvent, ExtensionEnv } from '../../Constant';
+import VsCodeEventService from '../../VsCodeEventService';
+import { ModelItem } from '../app/GlobalStateProvider';
 
-type InnerMessage = {
-	from: string; // extension|webview|react
-	eventName: string; // 事件名称，如：getCurrentFileName
-	data: string; // 数据，如：文件名
-};
-
+export interface WebviewInitData {
+	modelList: ModelItem[]
+}
 
 class ChatViewProvider implements vscode.WebviewViewProvider {
 
 	private _context: vscode.ExtensionContext;
 	private _view?: vscode.WebviewView;
+	private _initData: WebviewInitData;
 
-	constructor(private context: vscode.ExtensionContext) {
+	public getView() {
+		return this._view;
+	}
+	constructor(private context: vscode.ExtensionContext, private initData: WebviewInitData) {
 		this._context = context;
+		this._initData = initData;
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
 
-		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview);
+		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview, this._initData);
 		webviewView.webview.options = {
-			enableScripts: true
+			enableScripts: true,
+			enableCommandUris: true,
 		};
 		webviewView.webview.onDidReceiveMessage(
 			(message: DeepAiEvent) => {
-				console.log(`get message in vscode from ${message.from}, ${message.name}, ${message.data}`);
+				if (message.from.startsWith("vscode")) {
+					return;
+				}
+				console.log(`[webview provider] on event ${message.from}, ${message.name}, ${message.data}`);
 				VsCodeEventService.onEvent(message);
 			}
 		);
@@ -41,24 +48,27 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 	}
 
-	public emitEvent(eventName: string, data: string) {
-		let m: InnerMessage = {
-			from: 'extension',
-			eventName: eventName,
-			data: data
-		};
-		this._view?.webview.postMessage(m);
-	}
+	// public emitEvent(eventName: string, data: string) {
+	// 	console.log('[webview provider] emit event', eventName, data);
+	// 	let m: InnerMessage = {
+	// 		from: eventName.,
+	// 		eventName: eventName,
+	// 		data: data
+	// 	};
+	// 	this._view?.webview.postMessage(m);
+	// }
 }
 
 
-function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null) {
-	let isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null, initData: WebviewInitData) {
+	let isProduction = ExtensionEnv.isProduction === true;
+	// let isProduction = true
 	let srcUrl = '';
 	let jsUrl = '';
 	let webviewInitUrl = '';
-	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist', 'static/js/main.js'));
-	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/webview', 'webview_init.js'));
+	let initDataBase64 = Buffer.from(JSON.stringify(initData)).toString('base64');
+	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist_react', 'static/js/main.js'));
+	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/chat/webview', 'webview_init.js'));
 	if (webview) {
 		webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
 	}
@@ -67,6 +77,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 			jsUrl = webview.asWebviewUri(filePath).toString();
 		}
 	} else {
+		// srcUrl = "https://www.baidu.com"
 		srcUrl = 'http://localhost:3000';
 		// srcUrl = panel.webview.asWebviewUri(filePath).toString();
 	}
@@ -91,12 +102,12 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 		<script defer="defer" src="${webviewInitUrl}"></script>
 	</head>
 	<body style="height:95%">
-		<div id="root"></div>
+		<div id="root" initdata="${initDataBase64}"></div>
 		<iframe
 			id="webview-patch-iframe"
 			frameborder="0"
-			sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"
-			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
+			sandbox="allow-same-origin allow-pointer-lock allow-scripts allow-downloads allow-forms"
+			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write;"
 			style="width: 100%;height:100%"
 			src="${srcUrl}">
 		</iframe>

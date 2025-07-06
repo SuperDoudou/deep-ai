@@ -1,20 +1,27 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
-import ChatViewProvider from './webview/webview';
+import ChatViewProvider from './chat/webview/ChatWebview';
 import EditorDecoration from './editor/EditorDecoration';
 import LineActionCodeLensProvider from './editor/LineActionCodeLensProvider';
 import EditorService from './editor/EditorService';
+import VsCodeEventService from './VsCodeEventService';
+import { DeepAiEvent, ChangeVisibleTextEditorsEvent, ExtensionEnv } from './Constant';
+import VsCodeStorageService from './VsCodeStorageService';
 
 var provider: ChatViewProvider;
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "my-vscode-extendsion" is now active!');
-	// 注册CodeLens提供器
-	initConfig(context)
-	registeCodeLens(context);
-	registeCommand(context);
-	registeViewContainer(context);
-	registeEvent(context);
+	try {
+		registeStorage(context);
+		initConfig(context);
+		registeCodeLens(context);
+		registeCommand(context);
+		registeViewContainer(context);
+		registeEvent(context);
+	} catch (error) {
+		console.log(error);
+	}
 }
 
 export function deactivate() { }
@@ -35,22 +42,40 @@ function registeCommand(context: vscode.ExtensionContext) {
 		EditorDecoration.addButtonToLine(vscode.window.activeTextEditor!, 1);
 	});
 	context.subscriptions.push(textDecorationDisposable);
+
 }
 function registeViewContainer(context: vscode.ExtensionContext) {
-	provider = new ChatViewProvider(context);
+	provider = new ChatViewProvider(context, VsCodeStorageService.GetChatWebviewInitData());
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider("deep-ai-view", provider));
+	VsCodeEventService.setChatViewProvider(provider);
 }
-
 
 function registeEvent(context: vscode.ExtensionContext) {
 	EditorService.init();
 	vscode.window.onDidChangeVisibleTextEditors(
 		() => {
 			setTimeout(() => {
-				provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName || "");
-				vscode.window.visibleTextEditors.forEach((editor) => {
-					// console.log(`fileName ${vscode.window.activeTextEditor?.document.fileName}`);
-				});
+				let fileName = vscode.window.activeTextEditor?.document.fileName || "";
+				let fileText = vscode.window.activeTextEditor?.document.getText() || "";
+				if (vscode.window.visibleTextEditors?.some(
+					(editor) => editor.document.uri.scheme === 'deep-ai-diff'
+				)) {
+					return;
+				}
+				if (fileName === "") {
+					return;
+				}
+				let event = new ChangeVisibleTextEditorsEvent();
+				event.injectData(fileName, fileText);
+				// !!!// event.injectData(vscode.window.visibleTextEditors.map((editor) => {
+				// 	return editor.document.fileName;
+				// }));
+				VsCodeEventService.emitEvent(event);
+
+				// provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName || "");
+				// vscode.window.visibleTextEditors.forEach((editor) => {
+				// 	// console.log(`fileName ${vscode.window.activeTextEditor?.document.fileName}`);
+				// });
 			}, 0);
 		},
 	);
@@ -87,5 +112,11 @@ function registeCodeLens(context: vscode.ExtensionContext) {
 
 function initConfig(context: vscode.ExtensionContext) {
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
+	ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	ExtensionEnv.extensionPath = context.extensionPath;
+}
+
+function registeStorage(context: vscode.ExtensionContext) {
+	VsCodeStorageService.init(context);
 }
 

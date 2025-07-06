@@ -51,9 +51,10 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run build && pnpm run package",
-    "dev": "webpack-dev-server -c webpack.dev.js",
+    "dev_chat": "webpack-dev-server -c webpack.chat.dev.js",
+    "dev_diff": "webpack-dev-server -c webpack.diff.dev.js",
     "build_ex": "webpack -c webpack.config.js",
-    "build": "webpack -c webpack.prod.js",
+    "build": "webpack -c webpack.chat.prod.js",
     "compile": "webpack",
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
@@ -84,6 +85,7 @@
     "eslint": "^9.25.1",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.6.3",
+    "monaco-editor-webpack-plugin": "^7.1.0",
     "openai": "^5.3.0",
     "raw-loader": "^4.0.2",
     "style-loader": "^4.0.0",
@@ -95,9 +97,13 @@
     "webpack-dev-server": "^5.2.1"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "@types/diff-match-patch": "^1.0.36",
     "antd": "^5.26.0",
     "diff": "^8.0.2",
+    "diff-match-patch": "^1.0.5",
     "js-base64": "^3.7.7",
+    "monaco-editor": "^0.52.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-syntax-highlighter": "^15.6.1"

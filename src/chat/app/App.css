@@ -1,0 +1,330 @@
+#app_root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: flex-start;
+}
+
+body {
+    padding: 0;
+    color: #d4d4d4;
+    font-family: "Segoe WPC", "Segoe UI", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    height: 100%;
+    margin-right: 20px;
+}
+
+/* 整个滚动条的样式 */
+::-webkit-scrollbar {
+    width: 5px;
+    /* 滚动条宽度 */
+}
+
+/* 滚动轨道的样式 */
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0);
+    /* 轨道背景颜色 */
+}
+
+/* 滚动滑块的样式 */
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.3);
+    /* 滑块背景颜色 */
+}
+
+/* 滑块悬停状态 */
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* 滚动条按钮（上下箭头） */
+::-webkit-scrollbar-button {
+    display: none;
+    /* 隐藏默认箭头 */
+}
+
+.custom-scroll::-webkit-scrollbar {
+    width: 1px;
+    height: 5px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+textarea {
+    color: #d4d4d4;
+    background-color: rgb(30, 30, 30);
+    /* width: 100%; */
+
+}
+
+
+#chat_container {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 95vh;
+    width: 100%;
+    /* 确保容器至少和视口一样高 */
+}
+
+#chat_items {
+    flex: 1;
+    /* 占用剩余空间 */
+    overflow-y: auto;
+    /* 如果内容很多，允许滚动 */
+
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    align-items: flex-start;
+}
+
+#chat_input_part {
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 20px;
+    padding: 5px;
+    background-color: rgb(32, 32, 32);
+    width: 100%;
+}
+
+.chat_input_area_action_icon {
+    width: 16px;
+    margin-right: 5px;
+}
+
+.chat_input_area_model_icon {
+    width: 14px;
+    margin-right: 5px;
+}
+
+#chat_input_area_model_select {
+    height: 18px;
+    /* font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace; */
+    background-color: rgb(77, 77, 77);
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#chat_input_part:focus-within {
+    border-color: #7d96db;
+    /* 聚焦时边框变绿色 */
+    box-shadow: 0 0 0 2px rgba(136, 169, 212, 0.2);
+    /* 可选：轻微发光 */
+}
+
+.chat-context-area-file {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    /* 加重 */
+    font-weight: bold;
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
+    background-color: rgb(77, 77, 77);
+    height: 18px;
+    align-items: center;
+}
+
+#chat-context-area {
+    margin-left: 5px;
+}
+
+#chat_input_area {
+    box-sizing: border-box;
+    padding: 3px;
+    margin: 0px;
+    resize: none;
+    height: 120px;
+    border-width: 0px;
+    background-color: rgb(32, 32, 32);
+    width: calc(100% - 10px);
+}
+
+#chat_input_area_action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+#chat_input_area_action_right {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+#chat_input_area:focus {
+    outline: none;
+}
+
+#chat_input_button {
+    margin-left: auto;
+    margin-right: 0px;
+}
+
+#chat-item {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.chat-item-robot {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+
+}
+
+.chat-item-user {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: center;
+    flex-flow: row-reverse;
+}
+
+.chat-item-user-name {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.chat-item-user-block {
+    width: 10px;
+}
+
+
+
+.chat-item-user-avatar {
+    border-radius: 50%;
+}
+
+.chat-item-language-block {
+    width: calc(100% - 12px);
+    display: flex;
+    flex-direction: row;
+    align-items: top;
+    justify-content: space-between;
+    padding: 6px;
+}
+
+.chat-item-language-left,
+.chat-item-language-right {
+    display: flex;
+    flex-direction: row;
+    align-items: top;
+}
+
+.chat-item-language-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+}
+
+.chat-item-language-name {
+    font-family: Inconsolata, Monaco, Consolas, "Courier New", Courier, monospace;
+    width: 50px;
+    color: rgb(208, 255, 177);
+}
+
+.chat-item-language-button {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+}
+
+.chat-item-reasoning-content {
+    /*  左侧边框 */
+    padding-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgb(48, 48, 48);
+    border-left: 2px solid #b6b6b6;
+    /*  颜色变浅 */
+    opacity: 0.6;
+}
+
+.chat-item-content {
+    /* background-color: rgb(77, 77, 77); */
+    border-radius: 5px;
+    padding: px;
+}
+
+.chat-item-content-code {
+    background-color: rgb(10, 10, 10);
+    padding: 0px;
+    margin: 0px;
+    color: #d4d4d4;
+}
+
+.model-selector-container {
+    box-shadow: 0 0px 2px 2px rgba(192, 192, 192, 0.2);
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin-bottom: 5px;
+}
+
+.model-selector-item {
+    display: flex;
+    flex-direction: row;
+    width: calc(100% - 10px);
+    text-align: left;
+    margin-top: 2px;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-bottom: 2px;
+    border-radius: 3px;
+}
+
+.model-selector-item:hover {
+    background-color: rgb(66, 66, 66);
+}
+
+.model-config-modal {
+    background-color: rgb(10, 10, 10);
+    padding-top: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.model-config-label {
+    /* // 文字右对齐 */
+    text-align: right;
+    width:  80px;
+    margin-right: 10px;
+}
+.model-config-item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+      margin-bottom: 15px;
+}
+.model-config-input {
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: rgb(30, 30, 30);
+    color: #d4d4d4;
+
+}
+.model-config-input:focus {
+    outline: none;
+}
