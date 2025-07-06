@@ -19,6 +19,7 @@ class VsCodeService {
     public static updateModel(modelItems: ModelItem[]){
         let event = new UpdateModelEvent()
         event.injectData(modelItems)
+        AppMessage.sendMessage(event)
     }
 }
 export default VsCodeService;

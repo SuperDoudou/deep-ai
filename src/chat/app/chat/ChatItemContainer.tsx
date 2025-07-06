@@ -38,6 +38,7 @@ class MessageItem {
 function ChatContainer() {
 
     const [messagesList, setMessagesList] = useState<MessageItem[]>([])
+    const [sendingMessage, setSendingMessage] = useState(false);
 
     const [count, setCount] = useState(0);
     const llmServiceRef = useRef(null)
@@ -49,7 +50,7 @@ function ChatContainer() {
         messageItem.isRobot = randMessage.isRobot
         messageItem.avatar = randMessage.avatar
         messageItem.message = Base64.decode(testHelloString)
-
+        
         pushMessagesList(messageItem)
     }, [])
 
@@ -80,24 +81,29 @@ function ChatContainer() {
         console.log(`get input message ${message}`)
         let messageItem = new MessageItem(mockUser.name, false, mockUser.avatar, message, "")
         pushMessagesList(messageItem)
-
         let answerMessageItem = new MessageItem(mockUser.name, true, mockUser.avatar, "", "")
         answerMessageItem.status = "answering"
         pushMessagesList(answerMessageItem)
+        setSendingMessage(true)
         llmServiceRef.current?.sendText(message, contextAreaInfo,
-            (reasoningContent: string, answerContent: string) => {
+            (reasoningContent: string, answerContent: string, isEnd: boolean) => {
                 if (answerMessageItem.status === "stop") {
                     return
                 }
                 answerMessageItem.setReasoningContent(reasoningContent);
                 answerMessageItem.setMessage(answerContent);
                 setCount(count => count + 1)
+                if (isEnd) {
+                    answerMessageItem.status = "finish"
+                    setSendingMessage(false)
+                }
             })
     }
 
 
     function onStopSendingMessage(): void {
         messagesList[messagesList.length - 1].status = "stop"
+        setSendingMessage(false)
     }
 
     const mockUser = { name: '企鵝豆豆', avatar: Utils.svgToDataURL(svg) }
@@ -124,8 +130,8 @@ function ChatContainer() {
                         </ChatItem>
                     ))}
                 </div>
-                <InputArea onSendMessage={onInputMessage} onStopSendingMessage={onStopSendingMessage}
-                ></InputArea>
+                <InputArea onSendMessage={onInputMessage} onStopSendingMessage={onStopSendingMessage} sendingMessage={sendingMessage}>
+                </InputArea>
                 <LLMService ref={llmServiceRef}></LLMService>
             </div>
 

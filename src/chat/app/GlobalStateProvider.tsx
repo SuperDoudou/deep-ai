@@ -5,6 +5,7 @@ import AppMessage from "./AppMessage";
 import { InitChatEvent } from "../../Constant";
 
 export interface ModelItem {
+  id: number
   baseUrl: string;
   apiKey: string;
   modelName: string;
@@ -12,33 +13,37 @@ export interface ModelItem {
 }
 interface GlobalContext {
   modelList: ModelItem[];
+  updateGlobalContext: (k: string, v: any) => void;
 }
 // 创建一个 Context 对象
 export const GlobalAppContext = createContext<GlobalContext>({
   modelList: [],
+  updateGlobalContext: () => { }
 });
 
 function GlobalStateProvider({ children }: { children: any }) {
   const [state, setState] = useState<GlobalContext>({
-    modelList: [
-      {
+    modelList: [],
+    updateGlobalContext: (key, value) => {
+      setState(prev => ({ ...prev, [key]: value }));
+    }
+    /*
+          {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
         apiKey: 'sk-528b8213b23f4f00b7ac836652985ee1',
         modelName: 'deepseek-r1-distill-llama-70b',
         selected: true,
       },
-    ],
+    */
   });
 
-  useEffect(() => {
-    VsCodeService.updateModel(state.modelList)
-  }, [state.modelList])
 
   useEffect(() => {
-    let event = new InitChatEvent()
-    AppMessage.addEventListener(event.name, (data) => {
+    console.log(`init global data`)
+    AppMessage.addEventListener(new InitChatEvent().name, (data) => {
+      let event = new InitChatEvent()
       event.data = data
-      let { initData } = event.resolveData()
+      let initData = event.resolveData()
       console.log(initData)
 
       setState({
@@ -47,13 +52,7 @@ function GlobalStateProvider({ children }: { children: any }) {
       })
     })
   }, [])
-  // 可以在这里定义要共享的值
-  const value = {
-    state,
-    setState,
-    // 其他方法或值
-  };
-
+ 
   return (
     <GlobalAppContext.Provider value={state}>
       {children}

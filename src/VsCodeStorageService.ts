@@ -21,6 +21,7 @@ class VsCodeStorageService {
 
     public static GetChatWebviewInitData(): WebviewInitData {
         const modelItemsString = this._context.globalState.get<string>(this.chatInitDataKey);
+        console.log(`get init data ${modelItemsString}`);
         if (modelItemsString) {
             return JSON.parse(modelItemsString);
         }

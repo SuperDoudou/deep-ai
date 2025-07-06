@@ -27,7 +27,8 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview, this._initData);
 		webviewView.webview.options = {
-			enableScripts: true
+			enableScripts: true,
+			enableCommandUris: true,
 		};
 		webviewView.webview.onDidReceiveMessage(
 			(message: DeepAiEvent) => {
@@ -61,11 +62,12 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null, initData: WebviewInitData) {
 	let isProduction = ExtensionEnv.isProduction === true;
+	// let isProduction = true
 	let srcUrl = '';
 	let jsUrl = '';
 	let webviewInitUrl = '';
 	let initDataBase64 = Buffer.from(JSON.stringify(initData)).toString('base64');
-	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist', 'static/js/main.js'));
+	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist_react', 'static/js/main.js'));
 	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/chat/webview', 'webview_init.js'));
 	if (webview) {
 		webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
@@ -75,6 +77,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 			jsUrl = webview.asWebviewUri(filePath).toString();
 		}
 	} else {
+		// srcUrl = "https://www.baidu.com"
 		srcUrl = 'http://localhost:3000';
 		// srcUrl = panel.webview.asWebviewUri(filePath).toString();
 	}
@@ -103,8 +106,8 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 		<iframe
 			id="webview-patch-iframe"
 			frameborder="0"
-			sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"
-			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
+			sandbox="allow-same-origin allow-pointer-lock allow-scripts allow-downloads allow-forms"
+			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write;"
 			style="width: 100%;height:100%"
 			src="${srcUrl}">
 		</iframe>

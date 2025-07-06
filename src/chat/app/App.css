@@ -282,6 +282,8 @@ textarea {
 }
 
 .model-selector-item {
+    display: flex;
+    flex-direction: row;
     width: calc(100% - 10px);
     text-align: left;
     margin-top: 2px;

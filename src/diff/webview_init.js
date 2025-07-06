@@ -12,6 +12,10 @@ const vscode = acquireVsCodeApi();
 
  */
 
+window.addEventListener("message", (e) => {
+    window.dispatchEvent(new KeyboardEvent('keydown', JSON.parse(e.data)));
+}, false);
+
 window.addEventListener('message', event => {
     message = {
         from: event.data.from + "|webview", // vscode|webview|react
@@ -53,24 +57,4 @@ if (iframe) {
         console.log(`[diff] post message to react, ${data.name}, ${data.data}`);
         iframe.contentWindow.postMessage(data, '*'); // 最好指定具体origin而不是'*'
     };
-    // f: HTMLElement = iframe
-    // f.onload(() => {
-    // message = Array.from(document.styleSheets)
-    //     .map(sheet => {
-    //         try {
-    //             return Array.from(sheet.cssRules).map(rule => {
-    //                 // rule.cssText => html { scrollbar-color: var(--vscode-scrollbarSlider-background) var(--vscode-editor-background); 
-    //                 const replacedString = rule.cssText.replace(/var\(([^)]+)\)/g, (match, varName) => {
-    //                     return getComputedStyle(iframe).getPropertyValue(varName.substring(1)) || match; // 如果变量不在 map 里，保留原样
-    //                 });
-    //                 return replacedString + " "
-    //             }).join('');
-
-    //         } catch (e) {
-    //             return '';
-    //         }
-    //     })
-    //     .join('');
-    // iframe.contentWindow.postMessage(message, "http://localhost:3000");
-    // })
 }

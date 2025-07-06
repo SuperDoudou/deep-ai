@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { GlobalAppContext } from '../GlobalStateProvider';
+import VsCodeService from '../VsCodeService';
 
 // 定义保存配置的回调函数类型
 type SaveConfigCallback = (apiKey: string, baseUrl: string, modelName: string) => void;
@@ -14,15 +15,25 @@ function ModelConfigModal({ onClose }: ModelConfigModalProps) {
     const [modelName, setModelName] = useState('');
     const appContext = useContext(GlobalAppContext);
     const handleSave = () => {
-        appContext.modelList = ([
+        let maxId = 1
+        appContext.modelList.forEach(m => {
+            if (m.id > maxId) {
+                maxId = m.id
+            }
+        })
+        let newModelList = [
             ...appContext.modelList,
             {
+                id: maxId + 1,
                 apiKey: apiKey,
                 baseUrl: baseUrl,
                 modelName: modelName,
-                selected: true
+                selected: false
             }
-        ]);
+        ]
+        appContext.updateGlobalContext("modelList", newModelList);
+        VsCodeService.updateModel(newModelList)
+
         onClose();
     };
 

@@ -3,15 +3,15 @@ import "./App.css"
 import InputArea from './chat/InputArea';
 import ChatItem from './chat/ChatItem';
 import ChatContainer from './chat/ChatItemContainer';
-import { DeepAiEvent } from '../../Constantant';
 import { fromBase64 } from 'js-base64';
+import { DeepAiEvent } from '../../Constant';
 
 
 
 class AppMessage {
 
   private static listenerMap: Map<string, ((data: string) => void)[]> = new Map();
-
+  private static unhandleMessage: DeepAiEvent[] = []
   /**
    * 
    * @param eventName 
@@ -22,9 +22,15 @@ class AppMessage {
     if (!list) {
       list = [callback];
       this.listenerMap.set(eventName, list);
+      this.unhandleMessage.forEach(e => {
+        if (e.name == eventName) {
+          callback(e.data)
+        }
+      });
     } else {
       list.push(callback)
     }
+
   }
 
   public static init = () => {
@@ -38,13 +44,27 @@ class AppMessage {
       console.log(`[react] get message from ${innerMessage.from}, ${innerMessage.name}, ${innerMessage.data}`);
       AppMessage.messageHandler(innerMessage);
     });
+    window.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.code === "KeyC") {
+        document.execCommand("copy");
+      } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyX") {
+        document.execCommand("cut");
+      } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyV") {
+        document.execCommand("paste");
+        } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyA") {
+        document.execCommand("selectAll");
+      }
+    });
   }
 
   //
-  public static messageHandler(innerMessage: DeepAiEvent) {
-    let list = this.listenerMap.get(innerMessage.name)
+  public static messageHandler(event: DeepAiEvent) {
+    let list = this.listenerMap.get(event.name)
+    if (list == null || list.length == 0) {
+      AppMessage.unhandleMessage.push(event)
+    }
     list?.forEach(callback => {
-      callback(innerMessage.data)
+      callback(event.data)
     });
 
   }

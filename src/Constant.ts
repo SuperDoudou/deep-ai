@@ -1,5 +1,6 @@
 import { ModelItem } from "./chat/app/GlobalStateProvider";
 import { WebviewInitData } from "./chat/webview/ChatWebview";
+import { Base64 } from 'js-base64';
 
 export class ExtensionEnv {
     public static isProduction: boolean | null = null;
@@ -127,9 +128,9 @@ export class InitChatEvent implements DeepAiEvent {
         (initData: WebviewInitData) => {
             this.data = JSON.stringify(initData);
         };
-    resolveData: () => { initData: WebviewInitData } =
+    resolveData: () => WebviewInitData =
         () => {
-            return JSON.parse(this.data);
+            return JSON.parse(Base64.decode(this.data));
         };
 }
 
