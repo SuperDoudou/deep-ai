@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
-import { DeepAiEvent, ExtensionEnv } from '../../Constant';
+import { ChangeVisibleTextEditorsEvent, DeepAiEvent, ExtensionEnv } from '../../Constant';
 import VsCodeEventService from '../../VsCodeEventService';
 import { ModelItem } from '../app/GlobalStateProvider';
 import VsCodeStorageService from '../../VsCodeStorageService';
@@ -9,6 +9,8 @@ import VsCodeStorageService from '../../VsCodeStorageService';
 export interface WebviewInitData {
 	modelList: ModelItem[]
 	promptTemplate: string
+	filePath: string
+	fileText: string
 }
 
 class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -26,6 +28,9 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
+
+		this._initData.filePath = vscode.window.activeTextEditor?.document.fileName || "";
+		this._initData.fileText = vscode.window.activeTextEditor?.document.getText() || "";
 
 		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview, this._initData);
 		webviewView.webview.options = {
@@ -60,7 +65,6 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 	// 	this._view?.webview.postMessage(m);
 	// }
 }
-
 
 function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null, initData: WebviewInitData) {
 	let isProduction = ExtensionEnv.isProduction === true;

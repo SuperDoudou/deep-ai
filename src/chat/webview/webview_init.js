@@ -29,7 +29,7 @@ window.addEventListener('message', event => {
     console.log("[webview html] revieve event from " + event.data.from + " message:" + JSON.stringify(message));
     if (event.data.from.startsWith("vscode")) {
         if (iframe) {
-            iframe.contentWindow.postMessage(message, "https://localhost:3000");
+            iframe.contentWindow.postMessage(message, "http://localhost:3000");
         }
         return;
     }
