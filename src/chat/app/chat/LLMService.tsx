@@ -12,7 +12,7 @@ export const LLMService = forwardRef((props, ref) => {
     const clientMap = new Map<string, OpenAI>();
 
     useImperativeHandle(ref, () => ({
-        sendText: async (message: string, contextAreaInfo: ContextAreaInfo,
+        sendText: async (message: string, contextAreaInfo: ContextAreaInfo, promptTemplate: string,
             chunkCallBack: (reasoningContent: string, answer: string, isEnd: boolean) => void) => {
             // 检查是否已存在 OpenAI 客户端实例
             let model = appContext.modelList.filter(m => m.selected)[0];
@@ -39,8 +39,7 @@ export const LLMService = forwardRef((props, ref) => {
                 openai = clientMap.get(model.baseUrl + model.apiKey + model.modelName)!;
             }
 
-
-            let prompt = `文件名是： ${contextAreaInfo.fileName},文件内容是：${contextAreaInfo.fileText},生成的代码需要参考文件的缩进符号，指令是：${message}`
+            let prompt = promptTemplate.replace("${user_prompt}", message)
             console.log('prompt', prompt, appContext)
             let stream: any;
             try {

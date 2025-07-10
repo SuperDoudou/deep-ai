@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import "./App.css"
 import InputArea from './chat/InputArea';
 import ChatItem from './chat/ChatItem';
-import ChatContainer from './chat/ChatItemContainer';
+import ChatContainer from './chat/ChatContainer';
 import { fromBase64 } from 'js-base64';
 import { DeepAiEvent } from '../../Constant';
 
@@ -44,17 +44,23 @@ class AppMessage {
       console.log(`[react] get message from ${innerMessage.from}, ${innerMessage.name}, ${innerMessage.data}`);
       AppMessage.messageHandler(innerMessage);
     });
-    window.addEventListener('keydown', (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.code === "KeyC") {
-        document.execCommand("copy");
-      } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyX") {
-        document.execCommand("cut");
-      } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyV") {
-        document.execCommand("paste");
+    
+    const platform = window.navigator.platform;
+    const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+    const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+    if (macosPlatforms.indexOf(platform) !== -1) {
+      window.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.code === "KeyC") {
+          document.execCommand("copy");
+        } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyX") {
+          document.execCommand("cut");
+        } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyV") {
+          document.execCommand("paste");
         } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyA") {
-        document.execCommand("selectAll");
-      }
-    });
+          document.execCommand("selectAll");
+        }
+      });
+    }
   }
 
   //

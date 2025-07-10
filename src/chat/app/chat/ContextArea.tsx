@@ -14,6 +14,8 @@ export const ContextArea = forwardRef((props, ref) => {
 
     const [fileText, setFileText] = useState('');
 
+    const [promptTemplate, setPromptTemplate] = useState('');
+
     useEffect(() => {
 
         AppMessage.addEventListener(new ChangeVisibleTextEditorsEvent().name, (data) => {

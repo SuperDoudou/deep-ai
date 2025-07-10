@@ -13,17 +13,20 @@ export interface ModelItem {
 }
 interface GlobalContext {
   modelList: ModelItem[];
+  promptTemplate: string;
   updateGlobalContext: (k: string, v: any) => void;
 }
 // 创建一个 Context 对象
 export const GlobalAppContext = createContext<GlobalContext>({
   modelList: [],
+  promptTemplate: "",
   updateGlobalContext: () => { }
 });
 
 function GlobalStateProvider({ children }: { children: any }) {
   const [state, setState] = useState<GlobalContext>({
     modelList: [],
+    promptTemplate: "",
     updateGlobalContext: (key, value) => {
       setState(prev => ({ ...prev, [key]: value }));
     }
@@ -46,13 +49,17 @@ function GlobalStateProvider({ children }: { children: any }) {
       let initData = event.resolveData()
       console.log(initData)
 
+      if (initData.promptTemplate == null || initData.promptTemplate == "") {
+        initData.promptTemplate = "文件名是:${fileName},文件内容是:${fileText}，指令是：${user_prompt}"
+      }
       setState({
         ...state,
         modelList: initData.modelList,
+        promptTemplate: initData.promptTemplate,
       })
     })
   }, [])
- 
+
   return (
     <GlobalAppContext.Provider value={state}>
       {children}

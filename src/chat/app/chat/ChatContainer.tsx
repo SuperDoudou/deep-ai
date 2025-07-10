@@ -50,7 +50,7 @@ function ChatContainer() {
         messageItem.isRobot = randMessage.isRobot
         messageItem.avatar = randMessage.avatar
         messageItem.message = Base64.decode(testHelloString)
-        
+
         pushMessagesList(messageItem)
     }, [])
 
@@ -76,7 +76,7 @@ function ChatContainer() {
 
 
 
-    const onInputMessage = (message: string, contextAreaInfo: ContextAreaInfo) => {
+    const onInputMessage = (message: string, contextAreaInfo: ContextAreaInfo, promptTemplate: string) => {
 
         console.log(`get input message ${message}`)
         let messageItem = new MessageItem(mockUser.name, false, mockUser.avatar, message, "")
@@ -85,7 +85,7 @@ function ChatContainer() {
         answerMessageItem.status = "answering"
         pushMessagesList(answerMessageItem)
         setSendingMessage(true)
-        llmServiceRef.current?.sendText(message, contextAreaInfo,
+        llmServiceRef.current?.sendText(message, contextAreaInfo, promptTemplate,
             (reasoningContent: string, answerContent: string, isEnd: boolean) => {
                 if (answerMessageItem.status === "stop") {
                     return

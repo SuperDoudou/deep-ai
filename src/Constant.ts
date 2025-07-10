@@ -35,6 +35,9 @@ export class DeepAiEvent {
         if (name === "updateModel") {
             e = new UpdateModelEvent();
         }
+        if (name === "updatePromptTemplate") {
+            e = new UpdatePromptTemplateEvent();
+        }
         e.data = data;
         return e;
     }
@@ -147,5 +150,22 @@ export class UpdateModelEvent implements DeepAiEvent {
     resolveData: () => ModelItem[] =
         () => {
             return JSON.parse(this.data);
+        };
+}
+
+
+
+export class UpdatePromptTemplateEvent implements DeepAiEvent {
+    name: string = "updatePromptTemplate";
+    from: string = "chat";
+    description: string = "chat webview 向 vscode 发送当前prompt";
+    data: string = "";
+    injectData: (prompt: string) => void =
+        (prompt: string) => {
+            this.data = prompt;
+        };
+    resolveData: () => string =
+        () => {
+            return this.data;
         };
 }

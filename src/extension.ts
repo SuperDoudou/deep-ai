@@ -45,7 +45,7 @@ function registeCommand(context: vscode.ExtensionContext) {
 
 }
 function registeViewContainer(context: vscode.ExtensionContext) {
-	provider = new ChatViewProvider(context, VsCodeStorageService.GetChatWebviewInitData());
+	provider = new ChatViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider("deep-ai-view", provider));
 	VsCodeEventService.setChatViewProvider(provider);
 }

@@ -1,4 +1,4 @@
-import { AcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent, UpdateModelEvent } from "../../Constant";
+import { AcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent, UpdateModelEvent, UpdatePromptTemplateEvent } from "../../Constant";
 import AppMessage from "./AppMessage";
 import { ModelItem } from "./GlobalStateProvider";
 
@@ -16,9 +16,15 @@ class VsCodeService {
         AppMessage.sendMessage(event)
     }
 
-    public static updateModel(modelItems: ModelItem[]){
+    public static updateModel(modelItems: ModelItem[]) {
         let event = new UpdateModelEvent()
         event.injectData(modelItems)
+        AppMessage.sendMessage(event)
+    }
+
+    public static updatePromptTemplate(promptTemplate: string) {
+        let event = new UpdatePromptTemplateEvent() 
+        event.injectData(promptTemplate)
         AppMessage.sendMessage(event)
     }
 }

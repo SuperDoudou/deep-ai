@@ -4,9 +4,11 @@ import { register } from 'node:module';
 import { DeepAiEvent, ExtensionEnv } from '../../Constant';
 import VsCodeEventService from '../../VsCodeEventService';
 import { ModelItem } from '../app/GlobalStateProvider';
+import VsCodeStorageService from '../../VsCodeStorageService';
 
 export interface WebviewInitData {
 	modelList: ModelItem[]
+	promptTemplate: string
 }
 
 class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -18,9 +20,9 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 	public getView() {
 		return this._view;
 	}
-	constructor(private context: vscode.ExtensionContext, private initData: WebviewInitData) {
+	constructor(private context: vscode.ExtensionContext) {
 		this._context = context;
-		this._initData = initData;
+		this._initData = VsCodeStorageService.GetChatWebviewInitData();
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
