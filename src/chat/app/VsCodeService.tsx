@@ -4,9 +4,9 @@ import { ModelItem } from "./GlobalStateProvider";
 
 class VsCodeService {
 
-    public static updateTextEditor(text: string) {
+    public static updateTextEditor(uniqueKey: string, text: string) {
         let event = new UpdateCurrentEditorTextEvent()
-        event.injectData("", text)
+        event.injectData(uniqueKey, "", text)
         AppMessage.sendMessage(event)
     }
 

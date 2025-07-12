@@ -12,9 +12,9 @@ const vscode = acquireVsCodeApi();
 
  */
 
-window.addEventListener("message", (e) => {
-    window.dispatchEvent(new KeyboardEvent('keydown', JSON.parse(e.data)));
-}, false);
+// window.addEventListener("message", (e) => {
+//     window.dispatchEvent(new KeyboardEvent('keydown', JSON.parse(e.data)));
+// }, false);
 
 window.addEventListener('message', event => {
     message = {
@@ -23,7 +23,6 @@ window.addEventListener('message', event => {
         data: event.data.data // 数据，如：文件名
     };
 
-    console.log("[diff webview html] revieve event from " + event.data.from + " message:" + JSON.stringify(message));
     if (event.data.from.startsWith("vscode")) {
         if (iframe) {
             iframe.contentWindow.postMessage(message, "http://localhost:3001");

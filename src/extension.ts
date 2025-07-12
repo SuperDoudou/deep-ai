@@ -70,7 +70,7 @@ function registeEvent(context: vscode.ExtensionContext) {
 				// !!!// event.injectData(vscode.window.visibleTextEditors.map((editor) => {
 				// 	return editor.document.fileName;
 				// }));
-				VsCodeEventService.emitEvent(event);
+				VsCodeEventService.emitChatEvent(event);
 
 				// provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName || "");
 				// vscode.window.visibleTextEditors.forEach((editor) => {

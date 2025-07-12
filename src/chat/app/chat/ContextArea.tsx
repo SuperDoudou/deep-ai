@@ -29,9 +29,7 @@ export const ContextArea = forwardRef((props, ref) => {
     }
     useEffect(() => {
 
-        AppMessage.addEventListener(new ChangeVisibleTextEditorsEvent().name, (data) => {
-            let event = new ChangeVisibleTextEditorsEvent()
-            event.data = data
+        AppMessage.addEventListener(new ChangeVisibleTextEditorsEvent().name, (event: ChangeVisibleTextEditorsEvent) => {
             let { filePath, fileText } = event.resolveData()
             console.log(`get file name ${filePath}`)
             console.log(`get file text ${fileText}`)

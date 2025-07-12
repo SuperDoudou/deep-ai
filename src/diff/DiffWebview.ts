@@ -1,14 +1,14 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { ExtensionEnv } from '../Constant';
+import { ExtensionEnv, UpdateModifiedTextEvent } from '../Constant';
 import { Base64 } from 'js-base64';
 import VsCodeEventService from '../VsCodeEventService';
 
 export class DiffWebview {
 
-    private static panels: vscode.WebviewPanel[] = [];
+    private static panels: Map<string, vscode.WebviewPanel> = new Map();
     public static disposeAll() {
-        for (let panel of this.panels) {
+        for (let [k, panel] of this.panels) {
             panel.dispose();
         }
     }
@@ -52,7 +52,21 @@ export class DiffWebview {
   </html>`;
     }
 
-    public static show(filePath: string, originalContent: string, modifiedContent: string) {
+    public static show(uniqueKey: string, filePath: string | null, originalContent: string | null, modifiedContent: string) {
+        if (this.panels.has(uniqueKey)) {
+            let panel = this.panels.get(uniqueKey);
+            if (!panel) {
+                return;
+            }
+            let event = new UpdateModifiedTextEvent();
+            event.injectData(modifiedContent);
+            VsCodeEventService.emitDiffEvent(event, panel.webview);
+            return;
+        }
+        if (!filePath || !originalContent) {
+            console.error('DiffWebview show error, filePath or originalContent is null');
+            return;
+        }
         let showFilePath = filePath;
         originalContent = Buffer.from(originalContent).toString('base64');
         modifiedContent = Buffer.from(modifiedContent).toString('base64');
@@ -69,9 +83,8 @@ export class DiffWebview {
                 // ]
             }
         );
-        this.panels.push(panel);
+        this.panels.set(uniqueKey, panel);
         this.getHtml(panel.webview, filePath, originalContent, modifiedContent).then(html => {
-
             panel.webview.html = html;
         });
 

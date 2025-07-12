@@ -4,19 +4,23 @@ import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import Utils from '../Utils';
 import VsCodeService from '../VsCodeService';
 import { ContextAreaInfo } from './ContextArea';
+import { LLMService } from './LLMService';
 
 
 interface ChatItemProps {
+    id: number;
     name: string;// 用户名
     isRobot: boolean;
     avatar: string;
     message: string;
     reasoning: string;
+    userPrompt: string;
     contextAreaInfo: ContextAreaInfo;
 }
 
 interface MessageBlock {
-    type: string; // 消息类型，如 text, code
+    id: number;
+    type: "text" | "code"; // 消息类型，如 text, code
     language?: string; // 消息语言，如 JavaScript, Python
     content: string; // 消息内容
 }
@@ -26,7 +30,7 @@ const insertIcon = '<svg t="1749893062624" class="icon" viewBox="0 0 1024 1024" 
 const copyIcon = '<svg t="1749892978072" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4638" width="32" height="32"><path d="M704 202.666667a96 96 0 0 1 96 96v554.666666a96 96 0 0 1-96 96H213.333333A96 96 0 0 1 117.333333 853.333333V298.666667A96 96 0 0 1 213.333333 202.666667h490.666667z m0 64H213.333333A32 32 0 0 0 181.333333 298.666667v554.666666a32 32 0 0 0 32 32h490.666667a32 32 0 0 0 32-32V298.666667a32 32 0 0 0-32-32z" fill="#bfbfbf" p-id="4639"></path><path d="M277.333333 362.666667m32 0l298.666667 0q32 0 32 32l0 0q0 32-32 32l-298.666667 0q-32 0-32-32l0 0q0-32 32-32Z" fill="#bfbfbf" p-id="4640"></path><path d="M277.333333 512m32 0l298.666667 0q32 0 32 32l0 0q0 32-32 32l-298.666667 0q-32 0-32-32l0 0q0-32 32-32Z" fill="#bfbfbf" p-id="4641"></path><path d="M277.333333 661.333333m32 0l170.666667 0q32 0 32 32l0 0q0 32-32 32l-170.666667 0q-32 0-32-32l0 0q0-32 32-32Z" fill="#bfbfbf" p-id="4642"></path><path d="M320 138.666667h512A32 32 0 0 1 864 170.666667v576a32 32 0 0 0 64 0V170.666667A96 96 0 0 0 832 74.666667H320a32 32 0 0 0 0 64z" fill="#bfbfbf" p-id="4643"></path></svg>'
 const acceptIcon = '<svg t="1750681438892" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4333" width="200" height="200"><path d="M736.256 1024c-158.72 0-287.744-129.024-287.744-287.744s129.024-287.744 287.744-287.744S1024 576.512 1024 736.256 894.976 1024 736.256 1024z m177.152-414.72L736.256 786.432 604.16 655.36l-45.056 45.056L740.352 880.64l45.056-45.056-4.096-4.096L958.464 655.36l-45.056-46.08zM384 736.256c0 119.808 59.392 224.256 150.528 287.744H128C57.344 1024 0 966.656 0 896v-768C0 57.344 57.344 0 128 0H768c70.656 0 128 57.344 128 128v295.936c-48.128-24.576-102.4-39.936-159.744-39.936-194.56 0-352.256 157.696-352.256 352.256z m-256-287.744h320.512v-64.512H128v64.512z m640-256H128V256H768v-63.488z" p-id="4334" fill="#bfbfbf"></path></svg>'
 const doneIcon = '<svg t="1750681858376" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9734" width="200" height="200"><path d="M512 896A384 384 0 1 1 512 128a384 384 0 0 1 0 768z m-56.256-323.2l-67.84-67.84a32 32 0 1 0-45.248 45.184l90.496 90.496a32 32 0 0 0 45.248 0l226.24-226.24a32 32 0 1 0-45.248-45.248L455.744 572.8z" fill="#7DC535" p-id="9735"></path></svg>'
-function ChatItem({ name, isRobot, avatar, message, reasoning,contextAreaInfo }: ChatItemProps) {
+function ChatItem({ id, name, isRobot, avatar, message, reasoning, userPrompt, contextAreaInfo }: ChatItemProps) {
 
     let [hasInsert, setHasInsert] = useState(false)
     let [hasAccept, setHasAccept] = useState(false)
@@ -36,13 +40,13 @@ function ChatItem({ name, isRobot, avatar, message, reasoning,contextAreaInfo }:
         // 这里只是一个简单的示例，实际应用中需要根据具体情况进行解析
         message.split("```").forEach((block, index) => {
             if (index % 2 === 0) {
-                tempResult.push({ type: "text", content: block });
+                tempResult.push({ id: index, type: "text", content: block });
             } else {
                 let [language, ...content] = block.split("\n");
                 if (!language || language.trim() === "") {
                     language = "text";
                 }
-                tempResult.push({ type: "code", language: language.trim(), content: content.join("\n") });
+                tempResult.push({ id: index, type: "code", language: language.trim(), content: content.join("\n") });
             }
         });
         return tempResult;
@@ -51,9 +55,24 @@ function ChatItem({ name, isRobot, avatar, message, reasoning,contextAreaInfo }:
     const clickApplyCode = (code: string) => {
         console.log(`clickApplyCode: ${code} contextAreaInfo: ${contextAreaInfo.fileName}`)
 
+        let promptTemplate = "需要修改的文件是${fileText},已经得到要应用的代码片段是${code}，结合诉求：${userPrompt},"
+            + "请将变更后的代码片段应用到文件中去,并输出完整的文件，不要遗漏任何内容"
 
-        
-        VsCodeService.updateTextEditor(code)
+        let prompt = promptTemplate.replace("${userPrompt}", userPrompt)
+        prompt = prompt.replace("${fileText}", contextAreaInfo.fileText)
+        prompt = prompt.replace("${fileName}", contextAreaInfo.fileName)
+        prompt = prompt.replace("${code}", code)
+        LLMService.applyCode(prompt, (r, answer, isEnd) => {
+            let messageBlocks = parseMessage(answer)
+            for (let i = 0; i < messageBlocks.length; i++) {
+                let block = messageBlocks[i]
+                if (block.type === "code") {
+                    let uniqueKey = `chatID:${id}-blockID:${block.id}`
+                    VsCodeService.updateTextEditor(uniqueKey, block.content)
+                }
+            }
+        })
+
     }
 
 

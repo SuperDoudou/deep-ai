@@ -3,6 +3,7 @@ import { createContext } from 'react';
 import VsCodeService from "./VsCodeService";
 import AppMessage from "./AppMessage";
 import { InitChatEvent } from "../../Constant";
+import { LLMService } from "./chat/LLMService";
 
 export interface ModelItem {
   id: number
@@ -11,7 +12,7 @@ export interface ModelItem {
   modelName: string;
   selected: boolean;
 }
-interface GlobalContext {
+export interface GlobalContext {
   modelList: ModelItem[];
   promptTemplate: string;
   initFilePath: string | null;
@@ -32,7 +33,11 @@ function GlobalStateProvider({ children }: { children: any }) {
     modelList: [],
     promptTemplate: "",
     updateGlobalContext: (key, value) => {
-      setState(prev => ({ ...prev, [key]: value }));
+      setState(prev => {
+        let newState = { ...prev, [key]: value }
+        LLMService.appContext = newState
+        return newState
+      });
     },
     initFilePath: null,
     initFileText: null,
@@ -49,19 +54,18 @@ function GlobalStateProvider({ children }: { children: any }) {
 
   useEffect(() => {
     console.log(`init global data`)
-    AppMessage.addEventListener(new InitChatEvent().name, (data) => {
-      let event = new InitChatEvent()
-      event.data = data
+    AppMessage.addEventListener(new InitChatEvent().name, (event: InitChatEvent) => {
       let initData = event.resolveData()
       console.log(initData)
-
-      setState({
+      let newState = {
         ...state,
         modelList: initData.modelList,
         promptTemplate: initData.promptTemplate,
         initFilePath: initData.filePath,
         initFileText: initData.fileText,
-      })
+      }
+      LLMService.appContext = newState
+      setState(newState)
     })
   }, [])
 

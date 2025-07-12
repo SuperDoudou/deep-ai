@@ -30,7 +30,7 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 			initData.fileText = vscode.window.activeTextEditor?.document.getText() || "";
 			let e = new InitChatEvent();
 			e.injectData(initData);
-			VsCodeEventService.emitEvent(e);
+			VsCodeEventService.emitChatEvent(e);
 		})
 	}
 

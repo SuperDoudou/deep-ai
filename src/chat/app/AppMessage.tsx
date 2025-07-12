@@ -6,21 +6,21 @@ import { DeepAiEvent } from '../../Constant';
 
 class AppMessage {
 
-  private static listenerMap: Map<string, ((data: string) => void)[]> = new Map();
+  private static listenerMap: Map<string, ((data: DeepAiEvent) => void)[]> = new Map();
   private static unhandleMessage: DeepAiEvent[] = []
   /**
    * 
    * @param eventName 
    * @param callback 
    */
-  public static addEventListener = (eventName: string, callback: (data: string) => void) => {
+  public static addEventListener = (eventName: string, callback: (e: DeepAiEvent) => void) => {
     let list = this.listenerMap.get(eventName)
     if (!list) {
       list = [callback];
       this.listenerMap.set(eventName, list);
       this.unhandleMessage.forEach(e => {
         if (e.name == eventName) {
-          callback(e.data)
+          callback(e)
         }
       });
     } else {
@@ -33,12 +33,13 @@ class AppMessage {
     window.addEventListener('message', (event) => {
       // 验证来源域名
       let innerMessage: DeepAiEvent = JSON.parse(JSON.stringify(event.data)) as DeepAiEvent;
-      if (innerMessage.from == undefined || innerMessage.from.startsWith("react")) {
+      let e = DeepAiEvent.fromEventName(innerMessage.name, innerMessage.data)
+      if (e.from == undefined || e.from.startsWith("react")) {
         // 不处理
         return
       }
-      console.log(`[react] get message from ${innerMessage.from}, ${innerMessage.name}, ${innerMessage.data}`);
-      AppMessage.messageHandler(innerMessage);
+      console.log(`[react] get message from ${e.from}, ${e.name}, ${e.data}`);
+      AppMessage.messageHandler(e);
     });
     
     const platform = window.navigator.platform;
@@ -66,7 +67,7 @@ class AppMessage {
       AppMessage.unhandleMessage.push(event)
     }
     list?.forEach(callback => {
-      callback(event.data)
+      callback(event)
     });
 
   }

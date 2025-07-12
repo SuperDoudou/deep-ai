@@ -2,32 +2,42 @@ import React, { useState, useRef, useEffect } from 'react';
 import * as monaco from 'monaco-editor';
 import { Status } from './Status';
 import AppMessage from './AppMessage';
-import { AcceptCurrentEditorTextEvent } from '../../Constant';
+import { AcceptCurrentEditorTextEvent, DeepAiEvent, UpdateModifiedTextEvent } from '../../Constant';
 
 function DiffViewer(props: { filePath: string, originalContent: string, modifiedContent: string }) {
 
     console.log(`DiffViewer ${props.filePath}, ${props.originalContent}, ${props.modifiedContent}`)
     let editorRef = useRef(null);
-    let [diffEditor, setDiffEditor] = useState<monaco.editor.IStandaloneDiffEditor>();
+    let diffEditor: monaco.editor.IStandaloneDiffEditor | undefined;
 
     useEffect(() => {
-        setDiffEditor(monaco.editor.createDiffEditor(editorRef.current!, {
+        let temp = monaco.editor.createDiffEditor(editorRef.current!, {
             theme: 'vs-dark',
             renderSideBySide: true,
             useInlineViewWhenSpaceIsLimited: false,
             // renderGutterMenu: false
-        }));
-    }, [])
-    useEffect(() => {
-        console.log(`DiffViewer useEffect diffEditor=${diffEditor} ${props.originalContent}, ${props.modifiedContent}`)
-        if (!diffEditor) {
-            return;
-        }
-        diffEditor.setModel({
+        })
+        temp.setModel({
             original: monaco.editor.createModel(props.originalContent, 'json'),
             modified: monaco.editor.createModel(props.modifiedContent, 'json')
         });
-    }, [diffEditor])
+        diffEditor = temp;
+        AppMessage.addEventListener(new UpdateModifiedTextEvent().name, (event: UpdateModifiedTextEvent) => {
+            if (!diffEditor) {
+                return;
+            }
+            let { modifiedText } = event.resolveData()
+            console.log(`DiffViewer UpdateModifiedTextEvent ${modifiedText}`)
+            diffEditor?.getModel()?.original.setValue(props.originalContent);
+            diffEditor?.getModel()?.modified.setValue(modifiedText);
+        })
+    }, [])
+
+
+    useEffect(() => {
+        console.log(`DiffViewer UpdateOriginalTextEvent ${props.originalContent}`)
+        diffEditor?.getModel()?.original.setValue(props.originalContent);
+    }, [props.originalContent])
 
     let handleAcceptAll = () => {
         let event = new AcceptCurrentEditorTextEvent()

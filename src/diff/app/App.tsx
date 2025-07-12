@@ -11,11 +11,11 @@ function App() {
   const [modifiedContent, setModifiedContent] = useState("");
   
   AppMessage.init();
-  AppMessage.addEventListener(new InitDiffEvent, (data) => {
-    console.log(`App content1: ${data.resolveData()}`)
-    setFilePath(Base64.decode(data.resolveData().filePath))
-    setOriginalContent(Base64.decode(data.resolveData().originalContent))
-    setModifiedContent(Base64.decode(data.resolveData().modifiedContent))
+  AppMessage.addEventListener(new InitDiffEvent().name, (event: InitDiffEvent) => {
+    let { filePath, originalContent, modifiedContent } = event.resolveData()
+    setFilePath(Base64.decode(filePath))
+    setOriginalContent(Base64.decode(originalContent))
+    setModifiedContent(Base64.decode(modifiedContent))
     
   })
   return (

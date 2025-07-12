@@ -19,6 +19,7 @@ class MessageItem {
     public avatar: string = ""; // 对话的用户头像
     public message: string = ""; // 对话的消息内容
     public reasoningContent: string = ""; // 对话的思考内容
+    public userPrompt: string = ""; // 对话的用户输入
     public contextAreaInfo: ContextAreaInfo = {
         fileName: "",
         fileText: "",
@@ -52,7 +53,6 @@ function ChatContainer() {
     const [sendingMessage, setSendingMessage] = useState(false);
 
     const [count, setCount] = useState(0);
-    const llmServiceRef = useRef(null)
     useEffect(() => {
         let randMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)]
         let messageItem = new MessageItem(randMessage.name, randMessage.isRobot, randMessage.avatar,
@@ -87,16 +87,17 @@ function ChatContainer() {
 
 
 
-    const onInputMessage = (message: string, contextAreaInfo: ContextAreaInfo, promptTemplate: string) => {
+    const onInputMessage = (userPrompt: string, contextAreaInfo: ContextAreaInfo, promptTemplate: string) => {
 
-        console.log(`get input message ${message}`)
-        let messageItem = new MessageItem(mockUser.name, false, mockUser.avatar, message, "", contextAreaInfo)
+        console.log(`get input message ${userPrompt}`)
+        let messageItem = new MessageItem(mockUser.name, false, mockUser.avatar, userPrompt, "", contextAreaInfo)
         pushMessagesList(messageItem)
         let answerMessageItem = new MessageItem(mockUser.name, true, mockUser.avatar, "", "", contextAreaInfo)
         answerMessageItem.status = "answering"
+        answerMessageItem.userPrompt = userPrompt
         pushMessagesList(answerMessageItem)
         setSendingMessage(true)
-        llmServiceRef.current?.sendText(message, contextAreaInfo, promptTemplate,
+        LLMService.sendText(userPrompt, contextAreaInfo, promptTemplate,
             (reasoningContent: string, answerContent: string, isEnd: boolean) => {
                 if (answerMessageItem.status === "stop") {
                     return
@@ -142,11 +143,13 @@ function ChatContainer() {
                 <div id="chat_items">
                     {messagesList.map((item, index) => (
                         <ChatItem key={index}
+                            id={index}
                             name={item.name}
                             isRobot={item.isRobot}
                             avatar={item.avatar}
                             message={item.message}
                             reasoning={item.reasoningContent}
+                            userPrompt={item.userPrompt}
                             contextAreaInfo={item.contextAreaInfo}>
                         </ChatItem>
                     ))}
@@ -157,7 +160,6 @@ function ChatContainer() {
                     onStopSendingMessage={onStopSendingMessage}
                     sendingMessage={sendingMessage}>
                 </InputArea>
-                <LLMService ref={llmServiceRef}></LLMService>
             </div>
 
         </>

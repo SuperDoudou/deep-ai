@@ -42,6 +42,9 @@ export class DeepAiEvent {
             case "chatLoaded":
                 e = new ChatLoadedEvent();
                 break;
+            case "updateModifiedText":
+                e = new UpdateModifiedTextEvent();
+                break;
         }
         e.data = data;
         return e;
@@ -53,18 +56,39 @@ export class UpdateCurrentEditorTextEvent implements DeepAiEvent {
     from: string = "react";
     description: string = "webview 向 vscode 发送当前编辑器文本";
     data: string = "";
-    injectData: (filePath: string, fileText: string) => void =
-        (filePath: string, fileText: string) => {
+    injectData: (uniqueKey: string, filePath: string, fileText: string) => void =
+        (uniqueKey: string, filePath: string, fileText: string) => {
             this.data = JSON.stringify({
                 filePath,
                 fileText,
+                uniqueKey,
             });
         };
-    resolveData: () => { filePath: string, fileText: string } =
+    resolveData: () => { uniqueKey: string, filePath: string, fileText: string } =
         () => {
             return JSON.parse(this.data) as {
+                uniqueKey: string,
                 filePath: string,
                 fileText: string,
+            };
+        };
+}
+
+export class UpdateModifiedTextEvent implements DeepAiEvent {
+    name: string = "updateModifiedText";
+    from: string = "vscode";
+    description: string = "vscode 向 diff 发送当前编辑器文本";
+    data: string = "";
+    injectData: (modifiedText: string) => void =
+        (modifiedText: string) => {
+            this.data = JSON.stringify({
+                modifiedText
+            });
+        };
+    resolveData: () => { modifiedText: string } =
+        () => {
+            return JSON.parse(this.data) as {
+                modifiedText: string
             };
         };
 }
