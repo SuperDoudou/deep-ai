@@ -1,9 +1,5 @@
 import React, { useEffect } from 'react';
 import "./App.css"
-import InputArea from './chat/InputArea';
-import ChatItem from './chat/ChatItem';
-import ChatContainer from './chat/ChatContainer';
-import { fromBase64 } from 'js-base64';
 import { DeepAiEvent } from '../../Constant';
 
 

@@ -65,10 +65,11 @@ function InputArea({ onSendMessage, onStopSendingMessage, sendingMessage }: Inpu
     const handleInputSend = (e: any) => {
 
         let contextAreaInfo = contextAreaRef.current?.getDocInfo()
-        console.log(`fileName${contextAreaInfo.fileName} fileTexts:${contextAreaInfo.fileText}`)
+        let contextCopy = {...contextAreaInfo}
+        console.log(`fileName${contextCopy.fileName} fileTexts:${contextCopy.fileText}`)
         let promptTemplate = appContext.promptTemplate
         console.log(`get prompt:${promptTemplate}`)
-        onSendMessage(inputMessage, contextAreaInfo, promptTemplate);
+        onSendMessage(inputMessage, contextCopy, promptTemplate);
     };
 
     return (

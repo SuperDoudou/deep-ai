@@ -19,6 +19,10 @@ class MessageItem {
     public avatar: string = ""; // 对话的用户头像
     public message: string = ""; // 对话的消息内容
     public reasoningContent: string = ""; // 对话的思考内容
+    public contextAreaInfo: ContextAreaInfo = {
+        fileName: "",
+        fileText: "",
+    };
     public status: "init" | "answering" | "stop" | "finish" = "init"; // 对话的状态
     public setMessage = (message: string) => {
         this.message = message;
@@ -26,12 +30,19 @@ class MessageItem {
     public setReasoningContent = (reasoningContent: string) => {
         this.reasoningContent = reasoningContent;
     };
-    constructor(name: string, isRobot: boolean, avatar: string, message: string, reasoningContent: string) {
+    constructor(name: string,
+        isRobot: boolean,
+        avatar: string,
+        message: string,
+        reasoningContent: string,
+        contextAreaInfo: ContextAreaInfo) {
+
         this.name = name;
         this.isRobot = isRobot;
         this.avatar = avatar;
         this.message = message;
         this.reasoningContent = reasoningContent;
+        this.contextAreaInfo = contextAreaInfo;
     }
 };
 
@@ -45,7 +56,7 @@ function ChatContainer() {
     useEffect(() => {
         let randMessage = mockMessages[Math.floor(Math.random() * mockMessages.length)]
         let messageItem = new MessageItem(randMessage.name, randMessage.isRobot, randMessage.avatar,
-            randMessage.message, randMessage.reasoningContent)
+            randMessage.message, randMessage.reasoningContent, randMessage.contextAreaInfo)
         messageItem.name = randMessage.name
         messageItem.isRobot = randMessage.isRobot
         messageItem.avatar = randMessage.avatar
@@ -79,9 +90,9 @@ function ChatContainer() {
     const onInputMessage = (message: string, contextAreaInfo: ContextAreaInfo, promptTemplate: string) => {
 
         console.log(`get input message ${message}`)
-        let messageItem = new MessageItem(mockUser.name, false, mockUser.avatar, message, "")
+        let messageItem = new MessageItem(mockUser.name, false, mockUser.avatar, message, "", contextAreaInfo)
         pushMessagesList(messageItem)
-        let answerMessageItem = new MessageItem(mockUser.name, true, mockUser.avatar, "", "")
+        let answerMessageItem = new MessageItem(mockUser.name, true, mockUser.avatar, "", "", contextAreaInfo)
         answerMessageItem.status = "answering"
         pushMessagesList(answerMessageItem)
         setSendingMessage(true)
@@ -113,8 +124,14 @@ function ChatContainer() {
 
 
     const mockMessages: MessageItem[] = [
-        new MessageItem('用户1', true, Utils.svgToDataURL(svg), '你好，这是第一条消息', '这是第一条消息的思考过程'),
-        new MessageItem('用户2', true, Utils.svgToDataURL(svg), '今天的会议安排如何？', '这是第一条消息的思考过程222'),
+        new MessageItem('用户1', true, Utils.svgToDataURL(svg), '你好，这是第一条消息', '这是第一条消息的思考过程', {
+            fileName: "",
+            fileText: "",
+        }),
+        new MessageItem('用户2', true, Utils.svgToDataURL(svg), '今天的会议安排如何？', '这是第一条消息的思考过程222', {
+            fileName: "",
+            fileText: "",
+        }),
     ]
 
 
@@ -129,7 +146,8 @@ function ChatContainer() {
                             isRobot={item.isRobot}
                             avatar={item.avatar}
                             message={item.message}
-                            reasoning={item.reasoningContent}>
+                            reasoning={item.reasoningContent}
+                            contextAreaInfo={item.contextAreaInfo}>
                         </ChatItem>
                     ))}
                 </div>
