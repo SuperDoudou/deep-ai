@@ -17,26 +17,31 @@ export class DeepAiEvent {
 
     public static fromEventName(name: string, data: string) {
         let e: DeepAiEvent = new DeepAiEvent;
-        if (name === "updateCurrentEditorText") {
-            e = new UpdateCurrentEditorTextEvent();
-        }
-        if (name === "changeVisibleTextEditors") {
-            e = new ChangeVisibleTextEditorsEvent();
-        }
-        if (name === "acceptCurrentEditorText") {
-            e = new AcceptCurrentEditorTextEvent();
-        }
-        if (name === "initDiff") {
-            e = new InitDiffEvent();
-        }
-        if (name === "initChat") {
-            e = new InitChatEvent();
-        }
-        if (name === "updateModel") {
-            e = new UpdateModelEvent();
-        }
-        if (name === "updatePromptTemplate") {
-            e = new UpdatePromptTemplateEvent();
+        switch (name) {
+            case "updateCurrentEditorText":
+                e = new UpdateCurrentEditorTextEvent();
+                break;
+            case "changeVisibleTextEditors":
+                e = new ChangeVisibleTextEditorsEvent();
+                break;
+            case "acceptCurrentEditorText":
+                e = new AcceptCurrentEditorTextEvent();
+                break;
+            case "initDiff":
+                e = new InitDiffEvent();
+                break;
+            case "initChat":
+                e = new InitChatEvent();
+                break;
+            case "updateModel":
+                e = new UpdateModelEvent();
+                break;
+            case "updatePromptTemplate":
+                e = new UpdatePromptTemplateEvent();
+                break;
+            case "chatLoaded":
+                e = new ChatLoadedEvent();
+                break;
         }
         e.data = data;
         return e;
@@ -133,7 +138,22 @@ export class InitChatEvent implements DeepAiEvent {
         };
     resolveData: () => WebviewInitData =
         () => {
-            return JSON.parse(Base64.decode(this.data));
+            return JSON.parse(this.data);
+        };
+}
+
+export class ChatLoadedEvent implements DeepAiEvent {
+    name: string = "chatLoaded";
+    from: string = "chat";
+    description: string = "chat webview 向 vscode 发送当前已经加载完毕";
+    data: string = "";
+    injectData: () => void =
+        () => {
+            this.data = JSON.stringify({});
+        };
+    resolveData: () => {} =
+        () => {
+            return {};
         };
 }
 

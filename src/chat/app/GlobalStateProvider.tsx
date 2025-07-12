@@ -39,7 +39,7 @@ function GlobalStateProvider({ children }: { children: any }) {
     /*
           {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-        apiKey: 'sk-528b8213b23f4f00b7ac836652985ee1',
+        apiKey: '',
         modelName: 'deepseek-r1-distill-llama-70b',
         selected: true,
       },

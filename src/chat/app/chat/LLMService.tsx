@@ -40,11 +40,13 @@ export const LLMService = forwardRef((props, ref) => {
             }
 
             let prompt = promptTemplate.replace("${user_prompt}", message)
+            prompt = prompt.replace("${fileText}", contextAreaInfo.fileText)
+            prompt = prompt.replace("${fileName}", contextAreaInfo.fileName)
             console.log('prompt', prompt, appContext)
             let stream: any;
             try {
                 stream = await openai.chat.completions.create({
-                    model: "deepseek-r1-distill-llama-70b",  // 此处以 deepseek-r1 为例，可按需更换模型名称。
+                    model: model.modelName,  // 此处以 deepseek-r1 为例，可按需更换模型名称。
                     messages: [
                         { role: "user", content: prompt }
                     ],

@@ -5,11 +5,13 @@ import ChatItem from './chat/ChatItem';
 import ChatContainer from './chat/ChatContainer';
 import AppMessage from './AppMessage';
 import GlobalStateProvider from './GlobalStateProvider';
+import { ChatLoadedEvent } from '../../Constant';
 
 function App() {
 
   AppMessage.init();
 
+  AppMessage.sendMessage(new ChatLoadedEvent());
   return (
     <div id="app_root">
       <GlobalStateProvider>

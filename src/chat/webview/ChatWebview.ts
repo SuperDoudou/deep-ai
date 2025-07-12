@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
-import { ChangeVisibleTextEditorsEvent, DeepAiEvent, ExtensionEnv } from '../../Constant';
+import { ChangeVisibleTextEditorsEvent, ChatLoadedEvent, DeepAiEvent, ExtensionEnv, InitChatEvent } from '../../Constant';
 import VsCodeEventService from '../../VsCodeEventService';
 import { ModelItem } from '../app/GlobalStateProvider';
 import VsCodeStorageService from '../../VsCodeStorageService';
@@ -17,22 +17,29 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 	private _context: vscode.ExtensionContext;
 	private _view?: vscode.WebviewView;
-	private _initData: WebviewInitData;
 
 	public getView() {
 		return this._view;
 	}
 	constructor(private context: vscode.ExtensionContext) {
+		console.log("ChatViewProvider constructor");
 		this._context = context;
-		this._initData = VsCodeStorageService.GetChatWebviewInitData();
+		VsCodeEventService.registerEvent(new ChatLoadedEvent().name, (event: ChatLoadedEvent) => {
+			let initData = VsCodeStorageService.GetChatWebviewInitData();
+			initData.filePath = vscode.window.activeTextEditor?.document.fileName || "";
+			initData.fileText = vscode.window.activeTextEditor?.document.getText() || "";
+			let e = new InitChatEvent();
+			e.injectData(initData);
+			VsCodeEventService.emitEvent(e);
+		})
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
+		let initData = VsCodeStorageService.GetChatWebviewInitData();
+		initData.filePath = vscode.window.activeTextEditor?.document.fileName || "";
+		initData.fileText = vscode.window.activeTextEditor?.document.getText() || "";
 
-		this._initData.filePath = vscode.window.activeTextEditor?.document.fileName || "";
-		this._initData.fileText = vscode.window.activeTextEditor?.document.getText() || "";
-
-		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview, this._initData);
+		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview);
 		webviewView.webview.options = {
 			enableScripts: true,
 			enableCommandUris: true,
@@ -66,13 +73,12 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 	// }
 }
 
-function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null, initData: WebviewInitData) {
+function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null) {
 	let isProduction = ExtensionEnv.isProduction === true;
 	// let isProduction = true
 	let srcUrl = '';
 	let jsUrl = '';
 	let webviewInitUrl = '';
-	let initDataBase64 = Buffer.from(JSON.stringify(initData)).toString('base64');
 	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist_react', 'static/js/main.js'));
 	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/chat/webview', 'webview_init.js'));
 	if (webview) {
@@ -108,7 +114,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 		<script defer="defer" src="${webviewInitUrl}"></script>
 	</head>
 	<body style="height:95%">
-		<div id="root" initdata="${initDataBase64}"></div>
+		<div id="root"}"></div>
 		<iframe
 			id="webview-patch-iframe"
 			frameborder="0"

@@ -100,6 +100,9 @@ function ChatContainer() {
             })
     }
 
+    const onApplyCode = (code: string) => {
+        console.log(`apply code ${code}`)
+    }
 
     function onStopSendingMessage(): void {
         messagesList[messagesList.length - 1].status = "stop"
@@ -130,7 +133,11 @@ function ChatContainer() {
                         </ChatItem>
                     ))}
                 </div>
-                <InputArea onSendMessage={onInputMessage} onStopSendingMessage={onStopSendingMessage} sendingMessage={sendingMessage}>
+                <InputArea
+                    onSendMessage={onInputMessage}
+                    onApplyCode={onApplyCode}
+                    onStopSendingMessage={onStopSendingMessage}
+                    sendingMessage={sendingMessage}>
                 </InputArea>
                 <LLMService ref={llmServiceRef}></LLMService>
             </div>

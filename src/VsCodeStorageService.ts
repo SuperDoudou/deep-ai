@@ -37,7 +37,9 @@ class VsCodeStorageService {
         }
         return {
             modelList: [],
-            promptTemplate: ""
+            promptTemplate: "",
+            filePath: "",
+            fileText: ""
         };
     }
 
