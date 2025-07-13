@@ -30,12 +30,10 @@ class AppMessage {
       // 验证来源域名
       let innerMessage: DeepAiEvent = JSON.parse(JSON.stringify(event.data)) as DeepAiEvent;
       let e = DeepAiEvent.fromEventName(innerMessage.name, innerMessage.data)
-      if (e.from == undefined || e.from.startsWith("react")) {
+      if (e.from == undefined || e.from.startsWith("chat")) {
         // 不处理
         return
       }
-      console.log(`[diff] get message from ${e.from}, ${e.name}, ${e.data}`);
-
       AppMessage.messageHandler(e);
     });
   }
@@ -55,9 +53,8 @@ class AppMessage {
 
 
   private static sendMessageToParent = (eventName: string, data: string) => {
-    console.log(`发送消息`)
     const message = {
-      from: "react",
+      from: "diff",
       name: eventName,
       data: data
     };

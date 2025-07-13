@@ -24,8 +24,11 @@ export class DeepAiEvent {
             case "changeVisibleTextEditors":
                 e = new ChangeVisibleTextEditorsEvent();
                 break;
-            case "acceptCurrentEditorText":
-                e = new AcceptCurrentEditorTextEvent();
+            case "chatAcceptCurrentEditorText":
+                e = new ChatAcceptCurrentEditorTextEvent();
+                break;
+            case "diffAcceptCurrentEditorText":
+                e = new DiffAcceptCurrentEditorTextEvent();
                 break;
             case "initDiff":
                 e = new InitDiffEvent();
@@ -41,6 +44,9 @@ export class DeepAiEvent {
                 break;
             case "chatLoaded":
                 e = new ChatLoadedEvent();
+                break;
+            case "diffLoaded":
+                e = new DiffLoadedEvent();
                 break;
             case "updateModifiedText":
                 e = new UpdateModifiedTextEvent();
@@ -93,10 +99,31 @@ export class UpdateModifiedTextEvent implements DeepAiEvent {
         };
 }
 
-export class AcceptCurrentEditorTextEvent implements DeepAiEvent {
-    name: string = "acceptCurrentEditorText";
-    from: string = "react";
-    description: string = "webview 向 vscode 接受当前文本所有改动";
+export class ChatAcceptCurrentEditorTextEvent implements DeepAiEvent {
+    name: string = "chatAcceptCurrentEditorText";
+    from: string = "chat";
+    description: string = "chat 向 vscode 接受当前文本所有改动";
+    data: string = "";
+    injectData: (filePath: string, fileText: string) => void =
+        (filePath: string, fileText: string) => {
+            this.data = JSON.stringify({
+                filePath,
+                fileText
+            });
+        };
+    resolveData: () => { filePath: string, fileText: string } =
+        () => {
+            return JSON.parse(this.data) as {
+                filePath: string,
+                fileText: string
+            };
+        };
+}
+
+export class DiffAcceptCurrentEditorTextEvent implements DeepAiEvent {
+    name: string = "diffAcceptCurrentEditorText";
+    from: string = "diff";
+    description: string = "diff 向 vscode 接受当前文本所有改动";
     data: string = "";
     injectData: (filePath: string, fileText: string) => void =
         (filePath: string, fileText: string) => {
@@ -181,6 +208,22 @@ export class ChatLoadedEvent implements DeepAiEvent {
         };
 }
 
+
+
+export class DiffLoadedEvent implements DeepAiEvent {
+    name: string = "diffLoaded";
+    from: string = "diff";
+    description: string = "diff webview 向 vscode 发送当前已经加载完毕";
+    data: string = "";
+    injectData: () => void =
+        () => {
+            this.data = JSON.stringify({});
+        };
+    resolveData: () => {} =
+        () => {
+            return {};
+        };
+}
 
 export class UpdateModelEvent implements DeepAiEvent {
     name: string = "updateModel";

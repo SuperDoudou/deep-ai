@@ -78,9 +78,8 @@ class AppMessage {
 
 
   private static sendMessageToParent = (eventName: string, data: string) => {
-    console.log(`发送消息`)
     const message = {
-      from: "react",
+      from: "chat",
       name: eventName,
       data: data
     };

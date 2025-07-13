@@ -29,12 +29,11 @@ class VsCodeEventService {
     }
 
     public static emitChatEvent(event: DeepAiEvent) {
-        console.log('[vs code] emit event', event);
+        console.log('[vs code] emit chat event', event);
         this.chatViewProvider.getView()?.webview.postMessage(event);
     }
 
     public static emitDiffEvent(event: DeepAiEvent, webview: Webview) {
-        console.log('[vs code] emit event', event);
         webview.postMessage(event);
     }
 }

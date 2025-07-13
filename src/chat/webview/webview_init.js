@@ -32,7 +32,7 @@ window.addEventListener('message', event => {
         }
         return;
     }
-    if (event.data.from.startsWith("react")) {
+    if (event.data.from.startsWith("chat")) {
         // 发送消息到插件
         vscode.postMessage(message);
         return;

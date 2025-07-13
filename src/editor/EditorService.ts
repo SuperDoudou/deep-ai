@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import VsCodeEventService from '../VsCodeEventService';
-import { AcceptCurrentEditorTextEvent, DeepAiEvent, UpdateCurrentEditorTextEvent } from '../Constant';
+import { AcceptCurrentEditorTextEvent, ChatAcceptCurrentEditorTextEvent, DeepAiEvent, DiffAcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent } from '../Constant';
 import * as path from 'path';
 import LineActionCodeLensProvider from './LineActionCodeLensProvider';
 import * as diff from 'diff-match-patch';
@@ -207,9 +207,18 @@ class EditorService {
             }
         );
 
-        VsCodeEventService.registerEvent(new AcceptCurrentEditorTextEvent().name,
-            (messageEvent) => {
-                let event: AcceptCurrentEditorTextEvent = DeepAiEvent.fromEventName(messageEvent.name, messageEvent.data);
+        VsCodeEventService.registerEvent(new DiffAcceptCurrentEditorTextEvent().name,
+            (event: DiffAcceptCurrentEditorTextEvent) => {
+                let { filePath, fileText } = event.resolveData();
+                //
+                let filePathUri = vscode.Uri.file(filePath);
+                vscode.workspace.fs.writeFile(filePathUri, Buffer.from(fileText));
+                DiffWebview.disposeAll();
+                vscode.workspace.openTextDocument(filePath);
+            }
+        );
+        VsCodeEventService.registerEvent(new ChatAcceptCurrentEditorTextEvent().name,
+            (event: ChatAcceptCurrentEditorTextEvent) => {
                 let { filePath, fileText } = event.resolveData();
                 //
                 let filePathUri = vscode.Uri.file(filePath);

@@ -53,7 +53,6 @@ function ChatItem({ id, name, isRobot, avatar, message, reasoning, userPrompt, c
     }
 
     const clickApplyCode = (code: string) => {
-        console.log(`clickApplyCode: ${code} contextAreaInfo: ${contextAreaInfo.fileName}`)
 
         let promptTemplate = "需要修改的文件是${fileText},已经得到要应用的代码片段是${code}，结合诉求：${userPrompt},"
             + "请将变更后的代码片段应用到文件中去,并输出完整的文件，不要遗漏任何内容"
@@ -62,6 +61,7 @@ function ChatItem({ id, name, isRobot, avatar, message, reasoning, userPrompt, c
         prompt = prompt.replace("${fileText}", contextAreaInfo.fileText)
         prompt = prompt.replace("${fileName}", contextAreaInfo.fileName)
         prompt = prompt.replace("${code}", code)
+        
         LLMService.applyCode(prompt, (r, answer, isEnd) => {
             let messageBlocks = parseMessage(answer)
             for (let i = 0; i < messageBlocks.length; i++) {

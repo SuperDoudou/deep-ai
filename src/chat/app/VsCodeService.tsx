@@ -1,4 +1,4 @@
-import { AcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent, UpdateModelEvent, UpdatePromptTemplateEvent } from "../../Constant";
+import { ChatAcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent, UpdateModelEvent, UpdatePromptTemplateEvent } from "../../Constant";
 import AppMessage from "./AppMessage";
 import { ModelItem } from "./GlobalStateProvider";
 
@@ -11,7 +11,7 @@ class VsCodeService {
     }
 
     public static acceptTextEditor(filePath: string) {
-        let event = new AcceptCurrentEditorTextEvent()
+        let event = new ChatAcceptCurrentEditorTextEvent()
         // event.injectData("")
         AppMessage.sendMessage(event)
     }

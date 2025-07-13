@@ -2,13 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import * as monaco from 'monaco-editor';
 import { Status } from './Status';
 import AppMessage from './AppMessage';
-import { AcceptCurrentEditorTextEvent, DeepAiEvent, UpdateModifiedTextEvent } from '../../Constant';
+import { DeepAiEvent, DiffAcceptCurrentEditorTextEvent, InitDiffEvent, UpdateModifiedTextEvent } from '../../Constant';
+import { Base64 } from 'js-base64';
 
-function DiffViewer(props: { filePath: string, originalContent: string, modifiedContent: string }) {
+function DiffViewer() {
+    const [filePath, setFilePath] = useState("")
+    const [originalContent, setOriginalContent] = useState("")
 
-    console.log(`DiffViewer ${props.filePath}, ${props.originalContent}, ${props.modifiedContent}`)
+
     let editorRef = useRef(null);
-    let diffEditor: monaco.editor.IStandaloneDiffEditor | undefined;
+    let [diffEditor, setDiffEditor] = useState<monaco.editor.IStandaloneDiffEditor>()
 
     useEffect(() => {
         let temp = monaco.editor.createDiffEditor(editorRef.current!, {
@@ -18,31 +21,34 @@ function DiffViewer(props: { filePath: string, originalContent: string, modified
             // renderGutterMenu: false
         })
         temp.setModel({
-            original: monaco.editor.createModel(props.originalContent, 'json'),
-            modified: monaco.editor.createModel(props.modifiedContent, 'json')
+            original: monaco.editor.createModel("origin", 'json'),
+            modified: monaco.editor.createModel("modified", 'json')
         });
-        diffEditor = temp;
+        setDiffEditor(temp);
         AppMessage.addEventListener(new UpdateModifiedTextEvent().name, (event: UpdateModifiedTextEvent) => {
-            if (!diffEditor) {
+            if (!temp) {
                 return;
             }
             let { modifiedText } = event.resolveData()
-            console.log(`DiffViewer UpdateModifiedTextEvent ${modifiedText}`)
-            diffEditor?.getModel()?.original.setValue(props.originalContent);
-            diffEditor?.getModel()?.modified.setValue(modifiedText);
+            temp?.getModel()?.modified.setValue(modifiedText);
+        })
+        AppMessage.addEventListener(new InitDiffEvent().name, (event: InitDiffEvent) => {
+            let { filePath, originalContent, modifiedContent } = event.resolveData()
+            console.log(`Diff App InitDiffEvent ${filePath}, ${originalContent}`)
+            setFilePath(filePath)
+            setOriginalContent(originalContent)
+
+            temp?.getModel()?.original.setValue(originalContent);
         })
     }, [])
 
 
-    useEffect(() => {
-        console.log(`DiffViewer UpdateOriginalTextEvent ${props.originalContent}`)
-        diffEditor?.getModel()?.original.setValue(props.originalContent);
-    }, [props.originalContent])
-
-    let handleAcceptAll = () => {
-        let event = new AcceptCurrentEditorTextEvent()
-        event.injectData(props.filePath, diffEditor?.getModel()?.modified?.getValue() || "")
-        // event.injectData(diffEditor?.getModel()?.modified)
+    const handleAcceptAll = () => {
+        debugger
+        let event = new DiffAcceptCurrentEditorTextEvent()
+        let modifiedText = diffEditor?.getModel()?.modified?.getValue() || ""
+        event.injectData(filePath, modifiedText)
+        console.log(`Diff App DiffAcceptCurrentEditorTextEvent ${filePath}, ${modifiedText}`)
         AppMessage.sendMessage(event)
     }
     return (
@@ -58,10 +64,10 @@ function DiffViewer(props: { filePath: string, originalContent: string, modified
                     cursor: 'pointer',
                 }
             }
-                onClick={handleAcceptAll}>
+                onClick={() => handleAcceptAll()}>
                 ✅确认修改
             </div>
-            <div>{props.filePath}</div>
+            <div>{filePath}</div>
             <div id="diff_editor" ref={editorRef} style={{ height: '90vh', width: '100%' }} />
         </div>
     );

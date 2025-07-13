@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { ExtensionEnv, UpdateModifiedTextEvent } from '../Constant';
+import { DiffLoadedEvent, ExtensionEnv, InitDiffEvent, UpdateModifiedTextEvent } from '../Constant';
 import { Base64 } from 'js-base64';
 import VsCodeEventService from '../VsCodeEventService';
 
@@ -13,7 +13,7 @@ export class DiffWebview {
         }
     }
 
-    private static async getHtml(webview: vscode.Webview, filePath: string, originalContent: string, modifiedContent: string): Promise<string> {
+    private static async getHtml(webview: vscode.Webview): Promise<string> {
         let isProduction = ExtensionEnv.isProduction === true;
 
         let srcUrl = '';
@@ -39,7 +39,7 @@ export class DiffWebview {
 		<script defer="defer" src="${webviewInitUrl}"></script>
 	</head>
 	<body style="height:95%">
-		<div id="root" filePath="${filePath}" originalContent="${originalContent}" modifiedContent="${modifiedContent}" ></div>
+		<div id="root" ></div>
 		<iframe
 			id="webview-diff-iframe"
 			frameborder="0"
@@ -68,9 +68,6 @@ export class DiffWebview {
             return;
         }
         let showFilePath = filePath;
-        originalContent = Buffer.from(originalContent).toString('base64');
-        modifiedContent = Buffer.from(modifiedContent).toString('base64');
-        filePath = Buffer.from(filePath).toString('base64');
         const panel = vscode.window.createWebviewPanel(
             'monacoWebview',
             'preview:' + showFilePath,
@@ -84,12 +81,18 @@ export class DiffWebview {
             }
         );
         this.panels.set(uniqueKey, panel);
-        this.getHtml(panel.webview, filePath, originalContent, modifiedContent).then(html => {
+        this.getHtml(panel.webview).then(html => {
             panel.webview.html = html;
         });
 
         // 处理从Webview发送的消息
         panel.webview.onDidReceiveMessage(message => {
+            if (message.name === new DiffLoadedEvent().name) {
+
+                let event = new InitDiffEvent();
+                event.injectData(filePath, originalContent, modifiedContent);
+                VsCodeEventService.emitDiffEvent(event, panel.webview);
+            }
             VsCodeEventService.onEvent(message);
         });
     }

@@ -29,7 +29,7 @@ window.addEventListener('message', event => {
         }
         return;
     }
-    if (event.data.from.startsWith("react")) {
+    if (event.data.from.startsWith("diff")) {
         // 发送消息到插件
         vscode.postMessage(message);
         return;
@@ -41,19 +41,6 @@ window.addEventListener('message', event => {
 
 if (iframe) {
     const root = document.getElementById('root');
-    const originalContent = root?.getAttribute('originalContent') || "";
-    const modifiedContent = root?.getAttribute('modifiedContent') || "";
-    const filePath = root?.getAttribute('filePath') || "";
     iframe.onload = function () {
-        const data = {
-            name: 'initDiff',
-            data: JSON.stringify({
-                filePath,
-                originalContent,
-                modifiedContent,
-            }),
-        };
-        console.log(`[diff] post message to react, ${data.name}, ${data.data}`);
-        iframe.contentWindow.postMessage(data, '*'); // 最好指定具体origin而不是'*'
     };
 }

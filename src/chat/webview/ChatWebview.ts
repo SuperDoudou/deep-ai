@@ -49,7 +49,6 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 				if (message.from.startsWith("vscode")) {
 					return;
 				}
-				console.log(`[webview provider] on event ${message.from}, ${message.name}, ${message.data}`);
 				VsCodeEventService.onEvent(message);
 			}
 		);
