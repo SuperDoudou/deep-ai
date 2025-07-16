@@ -52,7 +52,7 @@ function ChatItem({ id, name, isRobot, avatar, message, reasoning, userPrompt, c
         return tempResult;
     }
 
-    const clickApplyCode = (code: string) => {
+    const clickApplyCode = (itemId: number, blockIndex: number, code: string) => {
 
         let promptTemplate = "需要修改的文件是${fileText},已经得到要应用的代码片段是${code}，结合诉求：${userPrompt},"
             + "请将变更后的代码片段应用到文件中去,并输出完整的文件，不要遗漏任何内容"
@@ -61,14 +61,15 @@ function ChatItem({ id, name, isRobot, avatar, message, reasoning, userPrompt, c
         prompt = prompt.replace("${fileText}", contextAreaInfo.fileText)
         prompt = prompt.replace("${fileName}", contextAreaInfo.fileName)
         prompt = prompt.replace("${code}", code)
-        
+        let uniqueKey = `chatID:${itemId}-blockID:${blockIndex}`
+        VsCodeService.updateTextEditor(uniqueKey, "")
         LLMService.applyCode(prompt, (r, answer, isEnd) => {
             let messageBlocks = parseMessage(answer)
             for (let i = 0; i < messageBlocks.length; i++) {
                 let block = messageBlocks[i]
                 if (block.type === "code") {
-                    let uniqueKey = `chatID:${id}-blockID:${block.id}`
                     VsCodeService.updateTextEditor(uniqueKey, block.content)
+                    break; // 只应用第一个代码块
                 }
             }
         })
@@ -129,7 +130,7 @@ function ChatItem({ id, name, isRobot, avatar, message, reasoning, userPrompt, c
                                                 title='应用代码'
                                                 onClick={() => {
                                                     setHasInsert(true)
-                                                    clickApplyCode(block.content)
+                                                    clickApplyCode(id, index, block.content)
                                                 }}></img>
                                         )}
                                         {hasInsert && !hasAccept && (

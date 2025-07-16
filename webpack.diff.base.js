@@ -10,7 +10,7 @@ module.exports = {
     filename: 'static/js/[name].js',
     path: path.join(__dirname, './dist_react/diff'),
     clean: true,
-    publicPath: '/',
+    publicPath: './',
   },
   module: {
     rules: [

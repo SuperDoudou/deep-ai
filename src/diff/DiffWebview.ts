@@ -37,6 +37,7 @@ export class DiffWebview {
 		<title>webview-react</title>
 		<script defer="defer" src="${jsUrl}"></script>
 		<script defer="defer" src="${webviewInitUrl}"></script>
+        <base href="${webview.asWebviewUri(vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist_react/diff/')))}">
 	</head>
 	<body style="height:95%">`;
         if (isProduction) {
@@ -79,9 +80,10 @@ export class DiffWebview {
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
-                // localResourceRoots: [
-                //     vscode.Uri.file(path.join(context.extensionPath, 'node_modules'))
-                // ]
+                localResourceRoots: [
+                    vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist_react/diff')),
+                    vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist/diff/webview')),
+                ]
             }
         );
         this.panels.set(uniqueKey, panel);
