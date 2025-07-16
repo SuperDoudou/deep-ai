@@ -34,9 +34,6 @@ window.addEventListener('message', event => {
         vscode.postMessage(message);
         return;
     }
-
-
-
 });
 
 if (iframe) {

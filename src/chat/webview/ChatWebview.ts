@@ -73,12 +73,11 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 }
 
 function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview | null) {
-	let isProduction = ExtensionEnv.isProduction === true;
-	// let isProduction = true
+	let isProduction = ExtensionEnv.isProduction;
 	let srcUrl = '';
 	let jsUrl = '';
 	let webviewInitUrl = '';
-	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist_react', 'static/js/main.js'));
+	const filePath = vscode.Uri.file(path.join(context.extensionPath, 'dist_react/chat', 'static/js/main.js'));
 	const webviewInitPath = vscode.Uri.file(path.join(context.extensionPath, 'dist/chat/webview', 'webview_init.js'));
 	if (webview) {
 		webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
@@ -88,7 +87,6 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 			jsUrl = webview.asWebviewUri(filePath).toString();
 		}
 	} else {
-		// srcUrl = "https://www.baidu.com"
 		srcUrl = 'http://localhost:3000';
 		// srcUrl = panel.webview.asWebviewUri(filePath).toString();
 	}
@@ -102,7 +100,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
   allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
   src="${srcUri}"
 ></iframe>*/
-	return `<!doctype html>
+	let html = `<!doctype html>
   <html lang="en" style="height:100%">
 	<head>
 		<meta charset="UTF-8">
@@ -112,18 +110,23 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 		<script defer="defer" src="${jsUrl}"></script>
 		<script defer="defer" src="${webviewInitUrl}"></script>
 	</head>
-	<body style="height:95%">
-		<div id="root"}"></div>
-		<iframe
+	<body style="height:95%">`;
+	if (isProduction) {
+		html += `<div id="root" style="width: 100%;height:100%">i'm in</div>`;
+	} else {
+		html += `<iframe
 			id="webview-patch-iframe"
 			frameborder="0"
 			sandbox="allow-same-origin allow-pointer-lock allow-scripts allow-downloads allow-forms"
 			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write;"
 			style="width: 100%;height:100%"
 			src="${srcUrl}">
-		</iframe>
-	</body>
+		</iframe>`;
+	}
+	html += `</body>
   </html>`;
+	console.log(html);
+	return html;
 }
 
 

@@ -58,7 +58,13 @@ class AppMessage {
       name: eventName,
       data: data
     };
-    window.parent.postMessage(message, "*"); // 替换为目标来源
+    if (window.parent) {
+      // dev mode
+      window.parent.postMessage(message, "*"); // 替换为目标来源
+    } else {
+      // prod mode
+      vscode.postMessage(message);
+    }
   }
 }
 

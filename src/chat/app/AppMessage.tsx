@@ -41,7 +41,7 @@ class AppMessage {
       console.log(`[react] get message from ${e.from}, ${e.name}, ${e.data}`);
       AppMessage.messageHandler(e);
     });
-    
+
     const platform = window.navigator.platform;
     const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
     const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
@@ -83,7 +83,13 @@ class AppMessage {
       name: eventName,
       data: data
     };
-    window.parent.postMessage(message, "*"); // 替换为目标来源
+    if (window.parent) {
+      // dev mode
+      window.parent.postMessage(message, "*"); // 替换为目标来源
+    } else {
+      // prod mode
+      vscode.postMessage(message);
+    }
   }
 }
 

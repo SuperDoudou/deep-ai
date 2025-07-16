@@ -19,7 +19,7 @@ export class DiffWebview {
         let srcUrl = '';
         let jsUrl = '';
         let webviewInitUrl = '';
-        const extensionFilePath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist', 'static/js/main.js'));
+        const extensionFilePath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist_react/diff', 'static/js/main.js'));
         const webviewInitPath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist/diff/webview', 'webview_init.js'));
         webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
         if (isProduction) {
@@ -28,7 +28,7 @@ export class DiffWebview {
             srcUrl = 'http://localhost:3001';
             // srcUrl = panel.webview.asWebviewUri(filePath).toString();
         }
-        return `<!doctype html>
+        let html = `<!doctype html>
   <html lang="en" style="height:100%">
 	<head>
 		<meta charset="UTF-8">
@@ -38,18 +38,22 @@ export class DiffWebview {
 		<script defer="defer" src="${jsUrl}"></script>
 		<script defer="defer" src="${webviewInitUrl}"></script>
 	</head>
-	<body style="height:95%">
-		<div id="root" ></div>
-		<iframe
+	<body style="height:95%">`;
+        if (isProduction) {
+            html += `<div id="root" ></div>`;
+        } else {
+            html += `<iframe
 			id="webview-diff-iframe"
 			frameborder="0"
 			sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"
 			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
 			style="width: 100%;height:100%"
 			src="${srcUrl}">
-		</iframe>
-	</body>
+		</iframe>`;
+        }
+        html += `</body>
   </html>`;
+        return html;
     }
 
     public static show(uniqueKey: string, filePath: string | null, originalContent: string | null, modifiedContent: string) {

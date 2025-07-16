@@ -112,7 +112,8 @@ function registeCodeLens(context: vscode.ExtensionContext) {
 
 function initConfig(context: vscode.ExtensionContext) {
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
-	ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	// ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	ExtensionEnv.isProduction = true
 	ExtensionEnv.extensionPath = context.extensionPath;
 }
 

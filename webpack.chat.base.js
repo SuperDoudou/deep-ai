@@ -8,7 +8,7 @@ module.exports = {
 
   output: {
     filename: 'static/js/[name].js',
-    path: path.join(__dirname, './dist_react'),
+    path: path.join(__dirname, './dist_react/chat'),
     clean: true,
     publicPath: '/',
   },
