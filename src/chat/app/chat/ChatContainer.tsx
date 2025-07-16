@@ -60,7 +60,7 @@ function ChatContainer() {
         messageItem.name = randMessage.name
         messageItem.isRobot = randMessage.isRobot
         messageItem.avatar = randMessage.avatar
-        messageItem.message = Base64.decode(testHelloString)
+        messageItem.message = randMessage.message; //Base64.decode(testHelloString)
 
         pushMessagesList(messageItem)
     }, [])
@@ -125,11 +125,7 @@ function ChatContainer() {
 
 
     const mockMessages: MessageItem[] = [
-        new MessageItem('用户1', true, Utils.svgToDataURL(svg), '你好，这是第一条消息', '这是第一条消息的思考过程', {
-            fileName: "",
-            fileText: "",
-        }),
-        new MessageItem('用户2', true, Utils.svgToDataURL(svg), '今天的会议安排如何？', '这是第一条消息的思考过程222', {
+        new MessageItem('用户1', true, Utils.svgToDataURL(svg), '你好，我是DeepAI编程助手有什么可以帮您？', '我的思考过程', {
             fileName: "",
             fileText: "",
         }),
