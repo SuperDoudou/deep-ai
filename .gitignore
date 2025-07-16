@@ -2,3 +2,4 @@ node_modules/
 dist/
 dist_react/
 debug.log
+*.vsix

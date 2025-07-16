@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import VsCodeEventService from '../VsCodeEventService';
-import { AcceptCurrentEditorTextEvent, ChatAcceptCurrentEditorTextEvent, DeepAiEvent, DiffAcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent } from '../Constant';
+import { ChatAcceptCurrentEditorTextEvent, DeepAiEvent, DiffAcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent } from '../Constant';
 import * as path from 'path';
 import LineActionCodeLensProvider from './LineActionCodeLensProvider';
 import * as diff from 'diff-match-patch';

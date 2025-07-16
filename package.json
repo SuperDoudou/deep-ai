@@ -1,6 +1,7 @@
 {
-  "name": "deep-ai",
-  "displayName": "deep-ai",
+  "name": "Deep-Code",
+  "displayName": "Deep-Code",
+  "publisher": "Deep-Code",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -51,6 +52,7 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run build && pnpm run package",
+    "build": "webpack -c webpack.config.js && webpack -c webpack.chat.prod.js && webpack -c webpack.diff.prod.js",
     "dev_chat": "webpack-dev-server -c webpack.chat.dev.js",
     "dev_diff": "webpack-dev-server -c webpack.diff.dev.js",
     "build_ex": "webpack -c webpack.config.js",

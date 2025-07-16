@@ -88,7 +88,8 @@ class AppMessage {
       window.parent.postMessage(message, "*"); // 替换为目标来源
     } else {
       // prod mode
-      vscode.postMessage(message);
+      // @ts-ignore
+      vscode?.postMessage(message);
     }
   }
 }

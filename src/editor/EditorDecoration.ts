@@ -68,7 +68,6 @@ class EditorDecoration {
                     backgroundColor: new vscode.ThemeColor('button.background'),
                     margin: '0 0 0 10px',
                     fontWeight: 'bold',
-                    cursor: 'pointer'
                 }
             }
         };

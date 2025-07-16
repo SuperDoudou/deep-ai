@@ -63,6 +63,7 @@ class AppMessage {
       window.parent.postMessage(message, "*"); // 替换为目标来源
     } else {
       // prod mode
+      // @ts-ignore
       vscode.postMessage(message);
     }
   }

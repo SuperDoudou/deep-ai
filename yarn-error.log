@@ -1,0 +1,138 @@
+Arguments: 
+  /Users/bytedance/.nvm/versions/node/v22.15.0/bin/node /usr/local/bin/yarn install
+
+PATH: 
+  /Users/bytedance/.nvm/versions/node/v22.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/usr/local/go/bin:/opt/puppetlabs/bin:/Users/bytedance/.nvm/versions/node/v22.15.0/bin:/Users/bytedance/micromamba/bin:/Users/bytedance/micromamba/condabin:/Users/bytedance/bin://Users/bytedance/go/bin:/Users/bytedance/go/bin/go/bin:/Users/bytedance/Library/Python/2.7/bin:/Users/bytedance/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  22.15.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile '/Users/bytedance/Library/Caches/Yarn/v6/npm-ignore-7.0.5-4cb5f6cd7d4c7ab0365738c7aea888baa6d7efd9-integrity/node_modules/ignore/LICENSE-MIT' -> '/Users/bytedance/go/src/code.byted.org/webcast/vs/deep-ai/node_modules/@typescript-eslint/eslint-plugin/node_modules/ignore/LICENSE-MIT'
+
+npm manifest: 
+  {
+    "name": "deep-ai",
+    "displayName": "deep-ai",
+    "description": "",
+    "version": "0.0.1",
+    "engines": {
+      "vscode": "^1.100.0"
+    },
+    "categories": [
+      "Other"
+    ],
+    "activationEvents": [],
+    "main": "./dist/extension.js",
+    "contributes": {
+      "viewsContainers": {
+        "activitybar": [
+          {
+            "id": "deep-ai-container",
+            "icon": "src/resources/robot.svg",
+            "title": "deep ai agent"
+          }
+        ]
+      },
+      "views": {
+        "deep-ai-container": [
+          {
+            "id": "deep-ai-view",
+            "type": "webview",
+            "name": "deep ai view"
+          }
+        ]
+      },
+      "commands": [
+        {
+          "command": "deep-ai.helloWorld",
+          "title": "Hello World"
+        },
+        {
+          "command": "deep-ai.getDoc",
+          "title": "GetDoc"
+        },
+        {
+          "command": "deep-ai.text",
+          "title": "decoration Text"
+        },
+        {
+          "command": "extension.addLineSuggestion",
+          "title": "Add Line Suggestion"
+        }
+      ]
+    },
+    "scripts": {
+      "vscode:prepublish": "pnpm run build && pnpm run package",
+      "build": "webpack -c webpack.config.js && webpack -c webpack.chat.prod.js && webpack -c webpack.diff.prod.js",
+      "dev_chat": "webpack-dev-server -c webpack.chat.dev.js",
+      "dev_diff": "webpack-dev-server -c webpack.diff.dev.js",
+      "build_ex": "webpack -c webpack.config.js",
+      "build_chat": "webpack -c webpack.chat.prod.js",
+      "build_diff": "webpack -c webpack.diff.prod.js",
+      "compile": "webpack",
+      "watch": "webpack --watch",
+      "package": "webpack --mode production --devtool hidden-source-map",
+      "compile-tests": "tsc -p . --outDir out",
+      "watch-tests": "tsc -p . -w --outDir out",
+      "pretest": "npm run compile-tests && npm run compile && npm run lint",
+      "lint": "eslint src",
+      "test": "vscode-test"
+    },
+    "devDependencies": {
+      "@babel/core": "^7.27.4",
+      "@babel/preset-react": "^7.27.1",
+      "@babel/preset-typescript": "^7.27.1",
+      "@svgr/webpack": "^8.1.0",
+      "@types/mocha": "^10.0.10",
+      "@types/node": "20.x",
+      "@types/react": "^19.1.6",
+      "@types/react-dom": "^19.1.5",
+      "@types/react-syntax-highlighter": "^15.5.13",
+      "@types/vscode": "^1.100.0",
+      "@typescript-eslint/eslint-plugin": "^8.31.1",
+      "@typescript-eslint/parser": "^8.31.1",
+      "@vscode/test-cli": "^0.0.10",
+      "@vscode/test-electron": "^2.5.2",
+      "babel-loader": "^10.0.0",
+      "copy-webpack-plugin": "^13.0.0",
+      "css-loader": "^7.1.2",
+      "eslint": "^9.25.1",
+      "file-loader": "^6.2.0",
+      "html-webpack-plugin": "^5.6.3",
+      "monaco-editor-webpack-plugin": "^7.1.0",
+      "openai": "^5.3.0",
+      "raw-loader": "^4.0.2",
+      "style-loader": "^4.0.0",
+      "svg-url-loader": "^8.0.0",
+      "ts-loader": "^9.5.2",
+      "typescript": "^5.8.3",
+      "webpack": "^5.99.7",
+      "webpack-cli": "^6.0.1",
+      "webpack-dev-server": "^5.2.1"
+    },
+    "dependencies": {
+      "@monaco-editor/react": "^4.7.0",
+      "@types/diff-match-patch": "^1.0.36",
+      "antd": "^5.26.0",
+      "diff": "^8.0.2",
+      "diff-match-patch": "^1.0.5",
+      "js-base64": "^3.7.7",
+      "monaco-editor": "^0.52.2",
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0",
+      "react-syntax-highlighter": "^15.6.1"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
