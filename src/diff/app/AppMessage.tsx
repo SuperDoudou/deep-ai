@@ -7,18 +7,18 @@ import { DeepAiEvent } from '../../Constant';
 
 class AppMessage {
 
-  private static listenerMap: Map<string, ((e: DeepAiEvent) => void)[]> = new Map();
+  private static listenerMap: Map<string, ((event: DeepAiEvent) => void)[]> = new Map();
 
   /**
    * 
    * @param eventName 
    * @param callback 
    */
-  public static addEventListener = (event: DeepAiEvent, callback: (e: DeepAiEvent) => void) => {
-    let list = this.listenerMap.get(event.name)
+  public static addEventListener = (eventName: string, callback: (event: DeepAiEvent) => void) => {
+    let list = this.listenerMap.get(eventName);
     if (!list) {
       list = [callback];
-      this.listenerMap.set(event.name, list);
+      this.listenerMap.set(eventName, list);
     } else {
       list.push(callback)
     }
@@ -29,22 +29,20 @@ class AppMessage {
 
       // 验证来源域名
       let innerMessage: DeepAiEvent = JSON.parse(JSON.stringify(event.data)) as DeepAiEvent;
-      let copyMessage = DeepAiEvent.fromEventName(innerMessage.name, innerMessage.data);
-      if (copyMessage.from == undefined || copyMessage.from.startsWith("react")) {
+      let e = DeepAiEvent.fromEventName(innerMessage.name, innerMessage.data)
+      if (e.from == undefined || e.from.startsWith("chat")) {
         // 不处理
         return
       }
-      console.log(`[diff] get message from ${copyMessage.from}, ${copyMessage.name}, ${copyMessage.data}`);
-
-      AppMessage.messageHandler(copyMessage);
+      AppMessage.messageHandler(e);
     });
   }
 
   //
-  public static messageHandler(innerMessage: DeepAiEvent) {
-    let list = this.listenerMap.get(innerMessage.name)
+  public static messageHandler(event: DeepAiEvent) {
+    let list = this.listenerMap.get(event.name)
     list?.forEach(callback => {
-      callback(innerMessage)
+      callback(event)
     });
 
   }
@@ -55,13 +53,19 @@ class AppMessage {
 
 
   private static sendMessageToParent = (eventName: string, data: string) => {
-    console.log(`发送消息`)
     const message = {
-      from: "react",
+      from: "diff",
       name: eventName,
       data: data
     };
-    window.parent.postMessage(message, "*"); // 替换为目标来源
+    if (window.parent) {
+      // dev mode
+      window.parent.postMessage(message, "*"); // 替换为目标来源
+    } else {
+      // prod mode
+      // @ts-ignore
+      vscode.postMessage(message);
+    }
   }
 }
 

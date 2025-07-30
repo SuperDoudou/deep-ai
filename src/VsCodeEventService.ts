@@ -1,3 +1,4 @@
+import { Webview } from "vscode";
 import { DeepAiEvent } from "./Constant";
 import ChatViewProvider from "./chat/webview/ChatWebview";
 
@@ -20,7 +21,6 @@ class VsCodeEventService {
     }
 
     public static onEvent(event: DeepAiEvent) {
-        console.log('[vs code] on event', event);
         let list = this.listenerMap.get(event.name);
         let e = DeepAiEvent.fromEventName(event.name, event.data);
         list?.forEach(callback => {
@@ -28,9 +28,13 @@ class VsCodeEventService {
         });
     }
 
-    public static emitEvent(event: DeepAiEvent) {
-        console.log('[vs code] emit event', event);
+    public static emitChatEvent(event: DeepAiEvent) {
+        console.log('[vs code] emit chat event', event);
         this.chatViewProvider.getView()?.webview.postMessage(event);
+    }
+
+    public static emitDiffEvent(event: DeepAiEvent, webview: Webview) {
+        webview.postMessage(event);
     }
 }
 

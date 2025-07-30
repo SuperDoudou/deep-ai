@@ -8,9 +8,9 @@ module.exports = {
   entry: path.join(__dirname, './src/diff/app/index.tsx'), // 入口文件
   output: {
     filename: 'static/js/[name].js',
-    path: path.join(__dirname, './dist_react'),
+    path: path.join(__dirname, './dist_react/diff'),
     clean: true,
-    publicPath: '/',
+    publicPath: './',
   },
   module: {
     rules: [

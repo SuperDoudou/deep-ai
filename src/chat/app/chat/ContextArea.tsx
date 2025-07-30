@@ -1,7 +1,8 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useState } from 'react';
 import AppMessage from '../AppMessage';
 import { JSX } from 'react/jsx-runtime';
 import { ChangeVisibleTextEditorsEvent } from '../../../Constant';
+import { GlobalAppContext } from '../GlobalStateProvider';
 
 export interface ContextAreaInfo {
     fileName: string;
@@ -10,34 +11,42 @@ export interface ContextAreaInfo {
 }
 export const ContextArea = forwardRef((props, ref) => {
 
-    const [fileName, setFileName] = useState('demo.docx');
+    const [fileName, setFileName] = useState('empty');
 
-    const [fileText, setFileText] = useState('');
+    const [fileText, setFileText] = useState('empty');
 
+    const appContext = useContext(GlobalAppContext);
+
+    const filterFilePath = (filePath: string|null):string => {
+        if(filePath == null){
+            return 'demo'
+        }
+        let tempList = filePath.split('/')
+        let temp = tempList[tempList.length - 1]
+        tempList = filePath.split('\\')
+        temp = tempList[tempList.length - 1]
+        return temp
+    }
     useEffect(() => {
 
-        AppMessage.addEventListener(new ChangeVisibleTextEditorsEvent().name, (data) => {
-            let event = new ChangeVisibleTextEditorsEvent()
-            event.data = data
+        AppMessage.addEventListener(new ChangeVisibleTextEditorsEvent().name, (event: ChangeVisibleTextEditorsEvent) => {
             let { filePath, fileText } = event.resolveData()
             console.log(`get file name ${filePath}`)
             console.log(`get file text ${fileText}`)
 
-            let tempList = filePath.split('/')
-            let temp = tempList[tempList.length - 1]
-            tempList = filePath.split('\\')
-            temp = tempList[tempList.length - 1]
-            setFileName(temp)
+
+            setFileName(filterFilePath(filePath))
             setFileText(fileText)
         })
+
 
     }, []);
 
     useImperativeHandle(ref, () => ({
         getDocInfo: () => {
             return {
-                fileText,
-                fileName
+                fileName: fileName == 'empty' ? filterFilePath(appContext.initFilePath) : fileName,
+                fileText: fileText == 'empty' ? appContext.initFileText : fileText,
             } as ContextAreaInfo
         },
     }));
@@ -49,7 +58,7 @@ export const ContextArea = forwardRef((props, ref) => {
                     paddingRight: "2px",
                     color: "rgb(168, 255, 96)",
                 }}>#</div>
-                {fileName}
+                {fileName == 'empty' ? filterFilePath(appContext.initFilePath) : fileName}
             </div>
         </div>
     );

@@ -1,12 +1,31 @@
-import React, { useContext, useState } from 'react';
+import React, { forwardRef, useContext, useImperativeHandle, useState } from 'react';
 import { GlobalAppContext } from '../GlobalStateProvider';
 import VsCodeService from '../VsCodeService';
+import AppMessage from '../AppMessage';
 
+interface PromptConfigModalProps {
+    onClose: () => void;
+}
 
-function PromptConfigModal({ onClose }: { onClose: () => void }) {
+export const PromptConfigModal = forwardRef((props: PromptConfigModalProps, ref) => {
+    const { onClose } = props;
     const appContext = useContext(GlobalAppContext);
-    const handleSave = () => {
+    // 这里存的是弹窗的临时文案
+    const [promptTemplate, setPromptTemplate] = useState(appContext.promptTemplate);
 
+    useImperativeHandle(ref, () => ({
+        getPromptTemplate: () => {
+            debugger
+            if (appContext.promptTemplate == null || appContext.promptTemplate == "") {
+                return "";
+            }
+            return appContext.promptTemplate;
+        }
+    }))
+
+    const handleSave = () => {
+        appContext.updateGlobalContext("promptTemplate", promptTemplate);
+        VsCodeService.updatePromptTemplate(promptTemplate);
         onClose();
     };
 
@@ -27,11 +46,16 @@ function PromptConfigModal({ onClose }: { onClose: () => void }) {
                 onClick={(e) => e.stopPropagation()} // 阻止事件冒泡
             >
                 <h2 style={{ marginTop: 0 }}>提示词配置</h2>
+                <textarea
+                    id="chat_input_area"
+                    value={promptTemplate}
+                    onChange={(e) => { setPromptTemplate(e.target.value) }}
+                />
                 <button onClick={handleSave}>保存</button>
                 <button onClick={onClose}>取消</button>
             </div>
         </div >
     );
-};
+})
 
 export default PromptConfigModal;

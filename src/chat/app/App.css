@@ -4,8 +4,10 @@
     height: 100%;
     align-items: flex-start;
 }
-
-body {
+code {
+    background-color: transparent;
+}
+/* body {
     padding: 0;
     color: #d4d4d4;
     font-family: "Segoe WPC", "Segoe UI", sans-serif;
@@ -13,7 +15,7 @@ body {
     font-weight: 400;
     height: 100%;
     margin-right: 20px;
-}
+} */
 
 /* 整个滚动条的样式 */
 ::-webkit-scrollbar {

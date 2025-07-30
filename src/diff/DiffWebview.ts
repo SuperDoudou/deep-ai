@@ -1,25 +1,25 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { ExtensionEnv } from '../Constant';
+import { DiffLoadedEvent, ExtensionEnv, InitDiffEvent, UpdateModifiedTextEvent } from '../Constant';
 import { Base64 } from 'js-base64';
 import VsCodeEventService from '../VsCodeEventService';
 
 export class DiffWebview {
 
-    private static panels: vscode.WebviewPanel[] = [];
+    private static panels: Map<string, vscode.WebviewPanel> = new Map();
     public static disposeAll() {
-        for (let panel of this.panels) {
+        for (let [k, panel] of this.panels) {
             panel.dispose();
         }
     }
 
-    private static async getHtml(webview: vscode.Webview, filePath: string, originalContent: string, modifiedContent: string): Promise<string> {
+    private static async getHtml(webview: vscode.Webview): Promise<string> {
         let isProduction = ExtensionEnv.isProduction === true;
 
         let srcUrl = '';
         let jsUrl = '';
         let webviewInitUrl = '';
-        const extensionFilePath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist', 'static/js/main.js'));
+        const extensionFilePath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist_react/diff', 'static/js/main.js'));
         const webviewInitPath = vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist/diff/webview', 'webview_init.js'));
         webviewInitUrl = webview.asWebviewUri(webviewInitPath).toString();
         if (isProduction) {
@@ -28,7 +28,7 @@ export class DiffWebview {
             srcUrl = 'http://localhost:3001';
             // srcUrl = panel.webview.asWebviewUri(filePath).toString();
         }
-        return `<!doctype html>
+        let html = `<!doctype html>
   <html lang="en" style="height:100%">
 	<head>
 		<meta charset="UTF-8">
@@ -37,26 +37,42 @@ export class DiffWebview {
 		<title>webview-react</title>
 		<script defer="defer" src="${jsUrl}"></script>
 		<script defer="defer" src="${webviewInitUrl}"></script>
+        <base href="${webview.asWebviewUri(vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist_react/diff/')))}">
 	</head>
-	<body style="height:95%">
-		<div id="root" filePath="${filePath}" originalContent="${originalContent}" modifiedContent="${modifiedContent}" ></div>
-		<iframe
+	<body style="height:95%">`;
+        if (isProduction) {
+            html += `<div id="root" ></div>`;
+        } else {
+            html += `<iframe
 			id="webview-diff-iframe"
 			frameborder="0"
 			sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-downloads"
 			allow="cross-origin-isolated; autoplay; clipboard-read; clipboard-write"
 			style="width: 100%;height:100%"
 			src="${srcUrl}">
-		</iframe>
-	</body>
+		</iframe>`;
+        }
+        html += `</body>
   </html>`;
+        return html;
     }
 
-    public static show(filePath: string, originalContent: string, modifiedContent: string) {
+    public static show(uniqueKey: string, filePath: string | null, originalContent: string | null, modifiedContent: string) {
+        if (this.panels.has(uniqueKey)) {
+            let panel = this.panels.get(uniqueKey);
+            if (!panel) {
+                return;
+            }
+            let event = new UpdateModifiedTextEvent();
+            event.injectData(modifiedContent);
+            VsCodeEventService.emitDiffEvent(event, panel.webview);
+            return;
+        }
+        if (!filePath || !originalContent) {
+            console.error('DiffWebview show error, filePath or originalContent is null');
+            return;
+        }
         let showFilePath = filePath;
-        originalContent = Buffer.from(originalContent).toString('base64');
-        modifiedContent = Buffer.from(modifiedContent).toString('base64');
-        filePath = Buffer.from(filePath).toString('base64');
         const panel = vscode.window.createWebviewPanel(
             'monacoWebview',
             'preview:' + showFilePath,
@@ -64,19 +80,25 @@ export class DiffWebview {
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
-                // localResourceRoots: [
-                //     vscode.Uri.file(path.join(context.extensionPath, 'node_modules'))
-                // ]
+                localResourceRoots: [
+                    vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist_react/diff')),
+                    vscode.Uri.file(path.join(ExtensionEnv.extensionPath!, 'dist/diff/webview')),
+                ]
             }
         );
-        this.panels.push(panel);
-        this.getHtml(panel.webview, filePath, originalContent, modifiedContent).then(html => {
-
+        this.panels.set(uniqueKey, panel);
+        this.getHtml(panel.webview).then(html => {
             panel.webview.html = html;
         });
 
         // 处理从Webview发送的消息
         panel.webview.onDidReceiveMessage(message => {
+            if (message.name === new DiffLoadedEvent().name) {
+
+                let event = new InitDiffEvent();
+                event.injectData(filePath, originalContent, modifiedContent);
+                VsCodeEventService.emitDiffEvent(event, panel.webview);
+            }
             VsCodeEventService.onEvent(message);
         });
     }

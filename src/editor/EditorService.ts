@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import VsCodeEventService from '../VsCodeEventService';
-import { AcceptCurrentEditorTextEvent, DeepAiEvent, UpdateCurrentEditorTextEvent } from '../Constant';
+import { ChatAcceptCurrentEditorTextEvent, DeepAiEvent, DiffAcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent } from '../Constant';
 import * as path from 'path';
 import LineActionCodeLensProvider from './LineActionCodeLensProvider';
 import * as diff from 'diff-match-patch';
@@ -8,7 +8,6 @@ import { Uri } from 'vscode';
 import { Base64 } from 'js-base64';
 import EditorUtils from './EditorUtils';
 import { ChangeContext, ChangeInfo } from './EditorConstant';
-import { DiffViewManager } from './DiffViewManager';
 import { DiffWebview } from '../diff/DiffWebview';
 
 
@@ -185,64 +184,41 @@ class EditorService {
             + '\n\n// 添加的安全检查函数\nfunction safeAccess(obj, path) {\n  return path.split(\'.\').reduce((acc, part) => acc && acc[part], obj);\n}';
     }
 
-    private static modifiedContent = "";
 
     public static init() {
-
-        // 注册内容提供者
-        vscode.workspace.registerTextDocumentContentProvider('deep-ai-diff', {
-            provideTextDocumentContent: (uri) => {
-                const originalUri = vscode.Uri.parse(new URLSearchParams(uri.query).get('original') || '');
-                return EditorService.modifiedContent;
-            }
-        });
-        let updateCurrentEditorText = new UpdateCurrentEditorTextEvent();
-        VsCodeEventService.registerEvent(updateCurrentEditorText.name,
-            (messageEvent) => {
-                let event: UpdateCurrentEditorTextEvent = DeepAiEvent.fromEventName(messageEvent.name, messageEvent.data);
-
-                LineActionCodeLensProvider.codeLensProviderInstance.clear();
-                const data = event.resolveData();
+        VsCodeEventService.registerEvent(new UpdateCurrentEditorTextEvent().name,
+            (messageEvent: UpdateCurrentEditorTextEvent) => {
+                const data = messageEvent.resolveData();
                 const editor = vscode.window.activeTextEditor;
                 if (!editor) {
-                    vscode.window.showErrorMessage('没有活动的文本编辑器');
+                    DiffWebview.show(data.uniqueKey, null, null, data.fileText);
                     return;
                 }
                 // data.fileText = Base64.decode("ewogICJjb21waWxlck9wdGlvbnMiOiB7CiAgICAibW9kdWxlIjogIk5vZGUxNiIsCiAgICAidGFyZ2V0IjogIkVTMjAyMiIsCiAgICAibGliIjogWyJFUzIwMjIiLCAiRE9NIiwgIkRPTS5JdGVyYWJsZSJdLAogICAgInNvdXJjZU1hcCI6IHRydWUsCiAgICAicm9vdERpciI6ICJzcmMiLAogICAgImpzeCI6ICJyZWFjdCIsCiAgICAic3RyaWN0IjogdHJ1ZSwKICAgICJub0ltcGxpY2l0UmV0dXJucyI6IHRydWUsCiAgICAibm9GYWxsdGhyb3VnaENhc2VzSW5Td2l0Y2giOiB0cnVlLAogICAgIm5vVW51c2VkUGFyYW1ldGVycyI6IHRydWUsCiAgICAib3V0RGlyIjogIi4vZGlzdCIsCiAgICAiYmFzZVVybCI6ICIuIiwKICAgICJwYXRocyI6IHsKICAgICAgIkAvKiI6IFsic3JjLyoiXQogICAgfSwKICAgICJlc01vZHVsZUludGVyb3AiOiB0cnVlLAogICAgInNraXBMaWJDaGVjayI6IHRydWUsCiAgICAiZm9yY2VDb25zaXN0ZW50Q2FzaW5nSW5GaWxlTmFtZXMiOiB0cnVlLAogICAgInN0cmljdE51bGxDaGVja3MiOiB0cnVlLAogICAgIm1vZHVsZVJlc29sdXRpb24iOiAiTm9kZU5leHQiLAogICAgInJlc29sdmVKc29uTW9kdWxlIjogdHJ1ZSwKICAgICJpc29sYXRlZE1vZHVsZXMiOiB0cnVlLAogICAgIm5vRW1pdE9uRXJyb3IiOiB0cnVlLAogICAgImluY3JlbWVudGFsIjogdHJ1ZSwKICAgICJ0c0J1aWxkSW5mb0ZpbGUiOiAic3JjLy50c2J1aWxkaW5mbyIKICB9LAogICJpbmNsdWRlIjogWyJzcmMvKiovKiJdLAogICJleGNsdWRlIjogWyJub2RlX21vZHVsZXMiXSwKICAiZXh0ZW5kcyI6ICIuL25vZGVfbW9kdWxlcy9AdHlwZXMvbm9kZS90c2NvbmZpZy5qc29uIgp9")
                 // EditorService.modifiedContent = EditorUtils.changeModifyFileIndentation(editor, data.fileText);
-                EditorService.modifiedContent = data.fileText;
+
                 const document = editor.document;
                 const filePath = document.uri.fsPath;
                 const originalContent = document.getText();
 
-                DiffWebview.show(document.uri.path, originalContent, EditorService.modifiedContent);
-                // // 创建虚拟文档URI
-                // let type = EditorService.getFileExtension(document.uri.path);
-                // const virtualUri = document.uri.with({
-                //     scheme: 'deep-ai-diff',
-                //     path: document.uri.path + '.modified' + Date.now() + (type === "" ? "" : "." + type),
-                //     query: `original=${encodeURIComponent(document.uri.toString())}`
-                // });
-
-
-
-                // // 打开diff视图
-                // vscode.commands.executeCommand('vscode.diff',
-                //     document.uri,
-                //     virtualUri,
-                //     `比较: ${path.basename(filePath)}`
-                // ).then(() => {
-                //     EditorService.addDiffCodeLenses(document.uri, originalContent,
-                //         virtualUri, EditorService.modifiedContent);
-                // });
+                DiffWebview.show(data.uniqueKey, document.uri.path, originalContent, data.fileText);
 
 
             }
         );
 
-        VsCodeEventService.registerEvent(new AcceptCurrentEditorTextEvent().name,
-            (messageEvent) => {
-                let event: AcceptCurrentEditorTextEvent = DeepAiEvent.fromEventName(messageEvent.name, messageEvent.data);
+        VsCodeEventService.registerEvent(new DiffAcceptCurrentEditorTextEvent().name,
+            (event: DiffAcceptCurrentEditorTextEvent) => {
+                let { filePath, fileText } = event.resolveData();
+                //
+                let filePathUri = vscode.Uri.file(filePath);
+                vscode.workspace.fs.writeFile(filePathUri, Buffer.from(fileText));
+                DiffWebview.disposeAll();
+                vscode.workspace.openTextDocument(filePath);
+            }
+        );
+        VsCodeEventService.registerEvent(new ChatAcceptCurrentEditorTextEvent().name,
+            (event: ChatAcceptCurrentEditorTextEvent) => {
                 let { filePath, fileText } = event.resolveData();
                 //
                 let filePathUri = vscode.Uri.file(filePath);

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import ChangeInfo, { ChangeContext } from './EditorConstant';
+import { ChangeContext } from './EditorConstant';
 
 
 class LineActionCodeLensProvider implements vscode.CodeLensProvider {

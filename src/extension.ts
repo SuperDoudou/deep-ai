@@ -45,7 +45,7 @@ function registeCommand(context: vscode.ExtensionContext) {
 
 }
 function registeViewContainer(context: vscode.ExtensionContext) {
-	provider = new ChatViewProvider(context, VsCodeStorageService.GetChatWebviewInitData());
+	provider = new ChatViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider("deep-ai-view", provider));
 	VsCodeEventService.setChatViewProvider(provider);
 }
@@ -70,7 +70,7 @@ function registeEvent(context: vscode.ExtensionContext) {
 				// !!!// event.injectData(vscode.window.visibleTextEditors.map((editor) => {
 				// 	return editor.document.fileName;
 				// }));
-				VsCodeEventService.emitEvent(event);
+				VsCodeEventService.emitChatEvent(event);
 
 				// provider.emitEvent('changeVisibleTextEditors', vscode.window.activeTextEditor?.document.fileName || "");
 				// vscode.window.visibleTextEditors.forEach((editor) => {
@@ -112,7 +112,8 @@ function registeCodeLens(context: vscode.ExtensionContext) {
 
 function initConfig(context: vscode.ExtensionContext) {
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
-	ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	// ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	ExtensionEnv.isProduction = true
 	ExtensionEnv.extensionPath = context.extensionPath;
 }
 
