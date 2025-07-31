@@ -78,6 +78,9 @@ function registeEvent(context: vscode.ExtensionContext) {
 				// });
 			}, 0);
 		},
+		vscode.window.onDidChangeTextEditorSelection((event: vscode.TextEditorSelectionChangeEvent) => {
+			console.log(event.kind);
+		})
 	);
 
 	// console.log(vscode.workspace.workspaceFolders);// 获得当前工作的workspace信息
@@ -112,8 +115,8 @@ function registeCodeLens(context: vscode.ExtensionContext) {
 
 function initConfig(context: vscode.ExtensionContext) {
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
-	// ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
-	ExtensionEnv.isProduction = true
+	ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	// ExtensionEnv.isProduction = true
 	ExtensionEnv.extensionPath = context.extensionPath;
 }
 

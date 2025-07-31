@@ -39,20 +39,32 @@ export const PromptConfigModal = forwardRef((props: PromptConfigModalProps, ref)
 
     return (
         <div
-            style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            style={
+                {
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
             onClick={handleOutsideClick}
         >
             <div className="model-config-modal"
                 onClick={(e) => e.stopPropagation()} // 阻止事件冒泡
             >
-                <h2 style={{ marginTop: 0 }}>提示词配置</h2>
+                <h2 style={{ height: "30px", marginTop: 0 }}>提示词配置</h2>
                 <textarea
-                    id="chat_input_area"
+                    id="prompt_config_input_area"
                     value={promptTemplate}
                     onChange={(e) => { setPromptTemplate(e.target.value) }}
                 />
-                <button onClick={handleSave}>保存</button>
-                <button onClick={onClose}>取消</button>
+                <div style={{height: "30px"}}>{`可使用变量：\${fileName}  \${fileText}  \${user_prompt}`}</div>
+                <button onClick={handleSave} style={{height: "30px"}}>保存</button>
+                <button onClick={onClose} style={{height: "30px"}}>取消</button>
             </div>
         </div >
     );

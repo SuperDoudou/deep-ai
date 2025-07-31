@@ -23,13 +23,13 @@ window.addEventListener('message', event => {
         data: event.data.data // 数据，如：文件名
     };
 
-    if (event.data.from.startsWith("vscode")) {
+    if (message.from.startsWith("vscode")) {
         if (iframe) {
             iframe.contentWindow.postMessage(message, "http://localhost:3001");
         }
         return;
     }
-    if (event.data.from.startsWith("diff")) {
+    if (message.from.startsWith("diff")) {
         // 发送消息到插件
         vscode.postMessage(message);
         return;

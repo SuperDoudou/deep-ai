@@ -8,6 +8,13 @@ class VsCodeStorageService {
     private static chatInitDataKey = 'chatInitData';
     private static _context: ExtensionContext;
 
+    private static defaultInitData: WebviewInitData = {
+        modelList: [],
+        promptTemplate: "你是一个辅助编程的机器人，文件名是${fileName} 文件内容是${fileText}，请根据文件内容回答：${user_prompt}",
+        filePath: "",
+        fileText: ""
+    }
+
     static init(context: ExtensionContext) {
         this._context = context;
         VsCodeEventService.registerEvent(new UpdateModelEvent().name,
@@ -33,14 +40,9 @@ class VsCodeStorageService {
         const initDataString = this._context.globalState.get<string>(this.chatInitDataKey);
         console.log(`get init data ${initDataString}`);
         if (initDataString) {
-            return JSON.parse(initDataString);
+            return JSON.parse(initDataString) as WebviewInitData;
         }
-        return {
-            modelList: [],
-            promptTemplate: "",
-            filePath: "",
-            fileText: ""
-        };
+        return this.defaultInitData;
     }
 
     public static SetChatWebviewInitData(data: WebviewInitData) {

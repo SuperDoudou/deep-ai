@@ -4,10 +4,12 @@
     height: 100%;
     align-items: flex-start;
 }
+
 code {
     background-color: transparent;
 }
-/* body {
+
+.body {
     padding: 0;
     color: #d4d4d4;
     font-family: "Segoe WPC", "Segoe UI", sans-serif;
@@ -15,7 +17,7 @@ code {
     font-weight: 400;
     height: 100%;
     margin-right: 20px;
-} */
+}
 
 /* 整个滚动条的样式 */
 ::-webkit-scrollbar {
@@ -145,6 +147,17 @@ textarea {
 
 #chat-context-area {
     margin-left: 5px;
+}
+
+#prompt_config_input_area {
+    box-sizing: border-box;
+    padding: 3px;
+    margin: 0px;
+    resize: none;
+    height: calc(100% - 100px);
+    border-width: 0px;
+    background-color: rgb(32, 32, 32);
+    width: calc(100% - 10px);
 }
 
 #chat_input_area {
@@ -301,6 +314,8 @@ textarea {
 
 .model-config-modal {
     background-color: rgb(10, 10, 10);
+    width: 80%;
+    height: 50%;
     padding-top: 10px;
     padding: 20px;
     border: 1px solid #ccc;
@@ -310,15 +325,17 @@ textarea {
 .model-config-label {
     /* // 文字右对齐 */
     text-align: right;
-    width:  80px;
+    width: 80px;
     margin-right: 10px;
 }
-.model-config-item{
+
+.model-config-item {
     display: flex;
     flex-direction: row;
     align-items: center;
-      margin-bottom: 15px;
+    margin-bottom: 15px;
 }
+
 .model-config-input {
     border: 1px solid #ccc;
     padding: 5px;
@@ -327,6 +344,7 @@ textarea {
     color: #d4d4d4;
 
 }
+
 .model-config-input:focus {
     outline: none;
 }
