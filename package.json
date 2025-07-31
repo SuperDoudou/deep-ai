@@ -3,7 +3,7 @@
   "displayName": "Deep-Code",
   "publisher": "Deep-Code",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.100.0"
   },
@@ -17,7 +17,7 @@
       "activitybar": [
         {
           "id": "deep-ai-container",
-          "icon": "src/resources/robot.svg",
+          "icon": "resources/robot.svg",
           "title": "deep ai agent"
         }
       ]
