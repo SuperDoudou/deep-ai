@@ -43,21 +43,21 @@ class AppMessage {
     });
 
     const platform = window.navigator.platform;
-    const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
-    const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
-    if (macosPlatforms.indexOf(platform) !== -1) {
-      window.addEventListener('keydown', (event) => {
-        if ((event.ctrlKey || event.metaKey) && event.code === "KeyC") {
-          document.execCommand("copy");
-        } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyX") {
-          document.execCommand("cut");
-        } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyV") {
-          document.execCommand("paste");
-        } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyA") {
-          document.execCommand("selectAll");
-        }
-      });
-    }
+    // const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+    // const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+    // if (macosPlatforms.indexOf(platform) !== -1) {
+    //   window.addEventListener('keydown', (event) => {
+    //     if ((event.ctrlKey || event.metaKey) && event.code === "KeyC") {
+    //       document.execCommand("copy");
+    //     } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyX") {
+    //       document.execCommand("cut");
+    //     } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyV") {
+    //       document.execCommand("paste");
+    //     } else if ((event.ctrlKey || event.metaKey) && event.code === "KeyA") {
+    //       document.execCommand("selectAll");
+    //     }
+    //   });
+    // }
   }
 
   //
