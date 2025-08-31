@@ -80,6 +80,7 @@ export class UpdateCurrentEditorTextEvent implements DeepAiEvent {
         };
 }
 
+
 export class UpdateModifiedTextEvent implements DeepAiEvent {
     name: string = "updateModifiedText";
     from: string = "vscode";

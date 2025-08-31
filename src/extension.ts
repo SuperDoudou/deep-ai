@@ -8,6 +8,8 @@ import EditorService from './editor/EditorService';
 import VsCodeEventService from './VsCodeEventService';
 import { DeepAiEvent, ChangeVisibleTextEditorsEvent, ExtensionEnv } from './Constant';
 import VsCodeStorageService from './VsCodeStorageService';
+import { get } from 'node:http';
+import CompletionHandler from './extension_handler/Completion';
 
 var provider: ChatViewProvider;
 export function activate(context: vscode.ExtensionContext) {
@@ -78,12 +80,10 @@ function registeEvent(context: vscode.ExtensionContext) {
 				// });
 			}, 0);
 		},
-		vscode.window.onDidChangeTextEditorSelection((event: vscode.TextEditorSelectionChangeEvent) => {
-			console.log(event.kind);
-		})
 	);
-
-	// console.log(vscode.workspace.workspaceFolders);// 获得当前工作的workspace信息
+	vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
+		CompletionHandler.handleCompletion(event);
+	});	// console.log(vscode.workspace.workspaceFolders);// 获得当前工作的workspace信息
 	// console.log(vscode.window.activeTextEditor?.document.uri.fsPath);// 获得当前打开的文档的路径
 	// console.log(vscode.window.activeTextEditor?.document.getText());// 获得当前打开的文档的内容
 }

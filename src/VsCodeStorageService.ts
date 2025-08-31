@@ -13,7 +13,7 @@ class VsCodeStorageService {
         promptTemplate: "你是一个辅助编程的机器人，文件名是${fileName} 文件内容是${fileText}，请根据文件内容回答：${user_prompt}",
         filePath: "",
         fileText: ""
-    }
+    };
 
     static init(context: ExtensionContext) {
         this._context = context;
@@ -38,7 +38,7 @@ class VsCodeStorageService {
 
     public static GetChatWebviewInitData(): WebviewInitData {
         const initDataString = this._context.globalState.get<string>(this.chatInitDataKey);
-        console.log(`get init data ${initDataString}`);
+        // console.log(`get init data ${initDataString}`);
         if (initDataString) {
             return JSON.parse(initDataString) as WebviewInitData;
         }
