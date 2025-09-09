@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import InputArea from './InputArea';
 import ChatItem from './ChatItem';
 import App from '../App';
-import AppMessage from '../AppMessage';
+import AppMessage from '../../../moduleService/ModuleAppMessage';
 import Utils from '../Utils';
 import { Base64 } from 'js-base64';
 import { ContextAreaInfo } from './ContextArea';

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ContextArea, ContextAreaInfo } from './ContextArea';
-import AppMessage from '../AppMessage';
+import AppMessage from '../../../moduleService/ModuleAppMessage';
 import Utils from '../Utils';
 import ModelSelector from './ModelSelector';
 import { GlobalAppContext } from '../GlobalStateProvider';

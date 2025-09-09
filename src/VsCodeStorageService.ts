@@ -17,23 +17,6 @@ class VsCodeStorageService {
 
     static init(context: ExtensionContext) {
         this._context = context;
-        VsCodeEventService.registerEvent(new UpdateModelEvent().name,
-            (e: UpdateModelEvent) => {
-                let modelItems = e.resolveData();
-                this.SetChatWebviewInitData({
-                    ...this.GetChatWebviewInitData(),
-                    modelList: modelItems
-                });
-            });
-
-        VsCodeEventService.registerEvent(new UpdatePromptTemplateEvent().name,
-            (e: UpdatePromptTemplateEvent) => {
-                let promptTemplate = e.resolveData();
-                this.SetChatWebviewInitData({
-                    ...this.GetChatWebviewInitData(),
-                    promptTemplate
-                });
-            });
     }
 
     public static GetChatWebviewInitData(): WebviewInitData {

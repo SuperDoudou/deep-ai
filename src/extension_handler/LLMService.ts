@@ -27,7 +27,7 @@ export class ExtensionLLMService {
     }
 
 
-    public static sendText = async (prompt: string,
+    public static chat = async (prompt: string,
         chunkCallBack: (reasoningContent: string, answer: string, isEnd: boolean) => void) => {
 
         let initData = VsCodeStorageService.GetChatWebviewInitData();
@@ -66,17 +66,7 @@ export class ExtensionLLMService {
             }
 
             const delta = chunk.choices[0].delta;
-
-            // 处理思考过程
-            if (delta.reasoning_content) {
-                reasoningContent += delta.reasoning_content;
-                chunkCallBack(reasoningContent, answerContent, false);
-            }
-            // 处理正式回复
-            else if (delta.content) {
-                answerContent += delta.content;
-                chunkCallBack(reasoningContent, answerContent, false);
-            }
+            chunkCallBack(delta.reasoning_content, delta.content, false);
         }
         console.log("message end")
         chunkCallBack(reasoningContent, answerContent, true);

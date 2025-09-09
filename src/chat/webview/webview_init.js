@@ -18,26 +18,16 @@ const vscode = acquireVsCodeApi();
 // }, false);
 
 window.addEventListener('message', event => {
-    if (!event.data.from) {
-        return
-    }
-    message = {
-        from: event.data.from + "|webview", // vscode|webview|react
-        name: event.data.name, // 事件名称，如：getCurrentFileName
-        data: event.data.data // 数据，如：文件名
-    };
-    if (event.data.from.startsWith("vscode")) {
+    console.log("chat webview receive message", event.data);
+    if (event.data.toServiceName === "ChatService") {
         if (iframe) {
-            iframe.contentWindow.postMessage(message, "http://localhost:3000");
+            iframe.contentWindow.postMessage(event.data, "http://localhost:3000");
         }
         return;
     }
-    if (event.data.from.startsWith("chat")) {
+    if (event.data.toServiceName === "ExtensionService") {
         // 发送消息到插件
-        vscode.postMessage(message);
+        vscode.postMessage(event.data);
         return;
     }
-
-
-
 });

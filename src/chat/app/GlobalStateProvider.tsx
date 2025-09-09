@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createContext } from 'react';
 import VsCodeService from "./VsCodeService";
-import AppMessage from "./AppMessage";
+import AppMessage from "../../moduleService/ModuleAppMessage";
 import { InitChatEvent } from "../../Constant";
 import { LLMService } from "./chat/LLMService";
 
@@ -54,19 +54,6 @@ function GlobalStateProvider({ children }: { children: any }) {
 
   useEffect(() => {
     console.log(`init global data`)
-    AppMessage.addEventListener(new InitChatEvent().name, (event: InitChatEvent) => {
-      let initData = event.resolveData()
-      console.log(initData)
-      let newState = {
-        ...state,
-        modelList: initData.modelList,
-        promptTemplate: initData.promptTemplate,
-        initFilePath: initData.filePath,
-        initFileText: initData.fileText,
-      }
-      LLMService.appContext = newState
-      setState(newState)
-    })
   }, [])
 
   return (

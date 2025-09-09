@@ -1,5 +1,5 @@
 import React, { forwardRef, useContext, useEffect, useImperativeHandle, useState } from 'react';
-import AppMessage from '../AppMessage';
+import AppMessage from '../../../moduleService/ModuleAppMessage';
 import { JSX } from 'react/jsx-runtime';
 import { ChangeVisibleTextEditorsEvent } from '../../../Constant';
 import { GlobalAppContext } from '../GlobalStateProvider';
@@ -29,15 +29,6 @@ export const ContextArea = forwardRef((props, ref) => {
     }
     useEffect(() => {
 
-        AppMessage.addEventListener(new ChangeVisibleTextEditorsEvent().name, (event: ChangeVisibleTextEditorsEvent) => {
-            let { filePath, fileText } = event.resolveData()
-            console.log(`get file name ${filePath}`)
-            console.log(`get file text ${fileText}`)
-
-
-            setFileName(filterFilePath(filePath))
-            setFileText(fileText)
-        })
 
 
     }, []);

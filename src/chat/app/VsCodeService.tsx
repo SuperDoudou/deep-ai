@@ -1,5 +1,5 @@
 import { ChatAcceptCurrentEditorTextEvent, UpdateCurrentEditorTextEvent, UpdateModelEvent, UpdatePromptTemplateEvent } from "../../Constant";
-import AppMessage from "./AppMessage";
+import AppMessage from "../../moduleService/ModuleAppMessage";
 import { ModelItem } from "./GlobalStateProvider";
 
 class VsCodeService {

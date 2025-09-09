@@ -2,9 +2,9 @@ import * as vscode from 'vscode';
 import path from 'node:path';
 import { register } from 'node:module';
 import { ChangeVisibleTextEditorsEvent, ChatLoadedEvent, DeepAiEvent, ExtensionEnv, InitChatEvent } from '../../Constant';
-import VsCodeEventService from '../../VsCodeEventService';
 import { ModelItem } from '../app/GlobalStateProvider';
 import VsCodeStorageService from '../../VsCodeStorageService';
+import { ExtensionMessageService } from '../../moduleService/extensionMessageService';
 
 export interface WebviewInitData {
 	modelList: ModelItem[]
@@ -24,14 +24,7 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 	constructor(private context: vscode.ExtensionContext) {
 		console.log("ChatViewProvider constructor");
 		this._context = context;
-		VsCodeEventService.registerEvent(new ChatLoadedEvent().name, (event: ChatLoadedEvent) => {
-			let initData = VsCodeStorageService.GetChatWebviewInitData();
-			initData.filePath = vscode.window.activeTextEditor?.document.fileName || "";
-			initData.fileText = vscode.window.activeTextEditor?.document.getText() || "";
-			let e = new InitChatEvent();
-			e.injectData(initData);
-			VsCodeEventService.emitChatEvent(e);
-		})
+		ExtensionMessageService.setChatViewProvider(this);
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
@@ -45,11 +38,9 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 			enableCommandUris: true,
 		};
 		webviewView.webview.onDidReceiveMessage(
-			(message: DeepAiEvent) => {
-				if (message.from.startsWith("vscode")) {
-					return;
-				}
-				VsCodeEventService.onEvent(message);
+			(message: any) => {
+				console.log("i'm here" + message);
+				ExtensionMessageService.getInstance().handleMessage(message);
 			}
 		);
 		this._view = webviewView;

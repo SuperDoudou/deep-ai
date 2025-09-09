@@ -1,7 +1,7 @@
 import React, { forwardRef, useContext, useImperativeHandle, useState } from 'react';
 import { GlobalAppContext } from '../GlobalStateProvider';
 import VsCodeService from '../VsCodeService';
-import AppMessage from '../AppMessage';
+import AppMessage from '../../../moduleService/ModuleAppMessage';
 
 interface PromptConfigModalProps {
     onClose: () => void;

@@ -10,6 +10,7 @@ import { DeepAiEvent, ChangeVisibleTextEditorsEvent, ExtensionEnv } from './Cons
 import VsCodeStorageService from './VsCodeStorageService';
 import { get } from 'node:http';
 import CompletionHandler from './extension_handler/Completion';
+import { ExtensionServiceImpl } from './moduleService/ExtensionServiceImpl';
 
 var provider: ChatViewProvider;
 export function activate(context: vscode.ExtensionContext) {
@@ -114,9 +115,10 @@ function registeCodeLens(context: vscode.ExtensionContext) {
 }
 
 function initConfig(context: vscode.ExtensionContext) {
+
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
-	ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
-	// ExtensionEnv.isProduction = true
+	// ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
+	ExtensionEnv.isProduction = false
 	ExtensionEnv.extensionPath = context.extensionPath;
 }
 
