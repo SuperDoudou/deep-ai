@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { ExtensionLLMService } from './LLMService';
+import { LLMService } from './LLMService';
 
 /**
  * 处理智能提示
@@ -19,7 +19,7 @@ class CompletionHandler {
         let prompt = `请根据代码${text}，补全的代码，只返回补全的代码，不要返回其他内容`;
 
 
-        ExtensionLLMService.sendText(prompt, (reasoningContent, answer, isEnd) => {
+        LLMService.chat(prompt, (reasoningContent, answer, isEnd) => {
             //
             answer = "func main() {\n    fmt.Println(\"Hello, dou World!\")\n}"
 
@@ -95,7 +95,7 @@ export function textToBase64ImageSVG(
         <rect 
         x="${5 + fontSize / 2 * (line.match(/^\s*/)?.[0].length || 0)}"
         y="${5 + (index + 1) * 20}" 
-        width="${line.length * fontSize/2}" 
+        width="${line.length * fontSize / 2}" 
         height="${fontSize}" 
         fill="#333333" />
 

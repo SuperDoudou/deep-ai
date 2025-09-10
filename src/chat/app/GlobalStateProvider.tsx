@@ -3,8 +3,7 @@ import { createContext } from 'react';
 import VsCodeService from "./VsCodeService";
 import AppMessage from "../../moduleService/ModuleAppMessage";
 import { InitChatEvent } from "../../Constant";
-import { LLMService } from "./chat/LLMService";
-import { ExtensionServiceImpl } from "../../moduleService/ExtensionServiceImpl";
+import { ExtensionServiceInterface } from "./ExtensionServiceInterface";
 
 export interface ModelItem {
   id: number
@@ -36,7 +35,6 @@ function GlobalStateProvider({ children }: { children: any }) {
     updateGlobalContext: (key, value) => {
       setState(prev => {
         let newState = { ...prev, [key]: value }
-        LLMService.appContext = newState
         return newState
       });
     },
@@ -47,7 +45,8 @@ function GlobalStateProvider({ children }: { children: any }) {
 
   useEffect(() => {
     console.log(`init global data`)
-    ExtensionServiceImpl.getInstance().getModelList().then(modelList => {
+    ExtensionServiceInterface.getInstance().getModelList().then(modelList => {
+      console.log(`init model list`, modelList)
       setState(prev => {
         return {
           ...prev,
@@ -56,6 +55,15 @@ function GlobalStateProvider({ children }: { children: any }) {
       })
     })
 
+     ExtensionServiceInterface.getInstance().getChatPromptTemplate().then(promptTemplate => {
+      console.log(`init promptTemplate`, promptTemplate)
+      setState(prev => {
+        return {
+          ...prev,
+          promptTemplate
+        }
+      })
+    })
   }, [])
 
   return (

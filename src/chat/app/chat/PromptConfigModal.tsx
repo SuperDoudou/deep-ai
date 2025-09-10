@@ -2,7 +2,7 @@ import React, { forwardRef, useContext, useImperativeHandle, useState } from 're
 import { GlobalAppContext } from '../GlobalStateProvider';
 import VsCodeService from '../VsCodeService';
 import AppMessage from '../../../moduleService/ModuleAppMessage';
-import { ExtensionServiceInterface } from '../extensionServiceInterface';
+import { ExtensionServiceInterface } from '../ExtensionServiceInterface';
 
 interface PromptConfigModalProps {
     onClose: () => void;

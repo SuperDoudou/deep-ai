@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import VsCodeStorageService from "../VsCodeStorageService";
 
-export class ExtensionLLMService {
+export class LLMService {
     public static clientMap = new Map<string, OpenAI>();
 
     public static getClient = (baseUrl: string, apiKey: string, modelName: string): OpenAI | undefined => {
@@ -30,8 +30,8 @@ export class ExtensionLLMService {
     public static chat = async (prompt: string,
         chunkCallBack: (reasoningContent: string, answer: string, isEnd: boolean) => void) => {
 
-        let initData = VsCodeStorageService.GetChatWebviewInitData();
-        let model = initData.modelList.filter(m => m.selected)[0];
+        let modelList = VsCodeStorageService.getInstance().getModelList();
+        let model = modelList.filter(m => m.selected)[0];
         if (!model) {
             chunkCallBack("", "No model selected", true);
             return;

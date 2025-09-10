@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { GlobalAppContext } from '../GlobalStateProvider';
 import VsCodeService from '../VsCodeService';
+import { ExtensionServiceInterface } from '../ExtensionServiceInterface';
 
 // 定义保存配置的回调函数类型
 type SaveConfigCallback = (apiKey: string, baseUrl: string, modelName: string) => void;
@@ -32,7 +33,7 @@ function ModelConfigModal({ onClose }: ModelConfigModalProps) {
             }
         ]
         appContext.updateGlobalContext("modelList", newModelList);
-        VsCodeService.updateModel(newModelList)
+        ExtensionServiceInterface.getInstance().setModelList({ modelList: newModelList })
 
         onClose();
     };
@@ -40,7 +41,7 @@ function ModelConfigModal({ onClose }: ModelConfigModalProps) {
     const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
         // 检查点击目标是否是最外层的 div
         if (e.target === e.currentTarget) {
-            onClose();
+            // onClose();
         }
     };
 

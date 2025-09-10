@@ -4,7 +4,6 @@ import { atomDark } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import Utils from '../Utils';
 import VsCodeService from '../VsCodeService';
 import { ContextAreaInfo } from './ContextArea';
-import { LLMService } from './LLMService';
 
 
 interface ChatItemProps {

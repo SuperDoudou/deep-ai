@@ -34,6 +34,7 @@ export interface ExtensionService {
         fileText: string
     }>
     updateChatPromptTemplate: ({ }: { promptTemplate: string }) => Promise<void>
+    getChatPromptTemplate: () => Promise<string>
     getModelList: () => Promise<ModelItem[]>
     setModelList: ({ }: { modelList: ModelItem[] }) => Promise<void>
 }

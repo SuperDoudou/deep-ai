@@ -45,11 +45,14 @@ export class ExtensionMessageService {
         if (typeof extensionServiceImpl[methodName] !== 'function') {
             throw new Error(`Method ${message.methodName} does not exist on ExtensionServiceImpl`);
         }
+        console.log(`handleMessage`, message)
         extensionServiceImpl[methodName](message.req).then((resp: any) => {
             if (isStreamMethod(message.toServiceName, message.methodName)) {
+                console.log(`handleMessage stream`, resp)
                 let sequenceId = 0;
                 (async () => {
                     for await (const chunk of resp) {
+                          console.log(`handleMessage chunk`, chunk)
                         let respMessage = new RespMessageImpl();
                         respMessage.fromServiceName = "ExtensionService";
                         respMessage.toServiceName = message.fromServiceName;
@@ -85,7 +88,6 @@ export class ExtensionMessageService {
     }
 
     public emitEvent(respMessage: RespMessage) {
-        console.log('[vs code] emit chat event', respMessage);
         ExtensionMessageService.chatViewProvider.getView()?.webview.postMessage(respMessage);
     }
 }

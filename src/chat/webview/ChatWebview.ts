@@ -26,7 +26,7 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 	}
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
-		let initData = VsCodeStorageService.GetChatWebviewInitData();
+		let initData = VsCodeStorageService.getInstance().GetChatWebviewInitData();
 
 		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview);
 		webviewView.webview.options = {

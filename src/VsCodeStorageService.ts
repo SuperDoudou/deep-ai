@@ -1,25 +1,32 @@
 import { ExtensionContext } from "vscode";
 import { ModelItem } from "./chat/app/GlobalStateProvider";
 import { WebviewInitData } from "./chat/webview/ChatWebview";
-import VsCodeEventService from "./VsCodeEventService";
-import { UpdateModelEvent, UpdatePromptTemplateEvent } from "./Constant";
 
 class VsCodeStorageService {
-    private static chatDataKey = 'chatData';
-    private static commonDataKey = 'commonData';
-    private static _context: ExtensionContext;
+    private chatDataKey = 'chatData';
+    private commonDataKey = 'commonData';
+    private static context: ExtensionContext;
 
-    private static defaultInitData: WebviewInitData = {
+    private defaultInitData: WebviewInitData = {
         modelList: [],
         promptTemplate: "你是一个辅助编程的机器人，文件名是${fileName} 文件内容是${fileText}，请根据文件内容回答：${user_prompt}",
     };
+    private static instance: VsCodeStorageService;
 
-    static init(context: ExtensionContext) {
-        this._context = context;
+    private constructor(context: ExtensionContext) {
+        VsCodeStorageService.context = context
+    }
+    public static getInstance(): VsCodeStorageService {
+        return this.instance;
+    }
+    public static init(context: ExtensionContext) {
+        console.log("aa+" + this)
+        console.log(`init storage service ${context}`)
+        this.instance = new VsCodeStorageService(context);
     }
 
-    public static GetChatWebviewInitData(): WebviewInitData {
-        const initDataString = this._context.globalState.get<string>(this.chatDataKey);
+    public GetChatWebviewInitData(): WebviewInitData {
+        const initDataString = VsCodeStorageService.context.globalState.get<string>(this.chatDataKey);
         // console.log(`get init data ${initDataString}`);
         if (initDataString) {
             return JSON.parse(initDataString) as WebviewInitData;
@@ -27,18 +34,19 @@ class VsCodeStorageService {
         return this.defaultInitData;
     }
 
-    public static getModelList(): ModelItem[] {
-        return this._context.globalState.get<ModelItem[]>(this.commonDataKey + "-" + "modelList") || [];
+    public getModelList(): ModelItem[] {
+        console.log("cc+" + this)
+        return VsCodeStorageService.context.globalState.get<ModelItem[]>(this.commonDataKey + "-" + "modelList") || [];
     }
-    public static setModelList(modelList: ModelItem[]) {
-        return this._context.globalState.update(this.commonDataKey + "-" + "modelList", modelList);
+    public setModelList(modelList: ModelItem[]) {
+        return VsCodeStorageService.context.globalState.update(this.commonDataKey + "-" + "modelList", modelList);
     }
 
-    public static getChatKey(key: "promptTemplate"): string {
-        return this._context.globalState.get<string>(this.chatDataKey + "-" + key) || "";
+    public getChatKey(key: "promptTemplate"): string {
+        return VsCodeStorageService.context.globalState.get<string>(this.chatDataKey + "-" + key) || "";
     }
-    public static setChatKey(key: "promptTemplate", value: string) {
-        this._context.globalState.update(this.chatDataKey + "-" + key, value);
+    public setChatKey(key: "promptTemplate", value: string) {
+        VsCodeStorageService.context.globalState.update(this.chatDataKey + "-" + key, value);
     }
 
 }

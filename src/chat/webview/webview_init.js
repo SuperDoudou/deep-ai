@@ -18,7 +18,6 @@ const vscode = acquireVsCodeApi();
 // }, false);
 
 window.addEventListener('message', event => {
-    console.log("chat webview receive message", event.data);
     if (event.data.toServiceName === "ChatService") {
         if (iframe) {
             iframe.contentWindow.postMessage(event.data, "http://localhost:3000");
