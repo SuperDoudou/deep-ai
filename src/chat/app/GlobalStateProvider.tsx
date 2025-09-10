@@ -4,6 +4,7 @@ import VsCodeService from "./VsCodeService";
 import AppMessage from "../../moduleService/ModuleAppMessage";
 import { InitChatEvent } from "../../Constant";
 import { LLMService } from "./chat/LLMService";
+import { ExtensionServiceImpl } from "../../moduleService/ExtensionServiceImpl";
 
 export interface ModelItem {
   id: number
@@ -41,19 +42,20 @@ function GlobalStateProvider({ children }: { children: any }) {
     },
     initFilePath: null,
     initFileText: null,
-    /*
-          {
-        baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-        apiKey: '',
-        modelName: 'deepseek-r1-distill-llama-70b',
-        selected: true,
-      },
-    */
   });
 
 
   useEffect(() => {
     console.log(`init global data`)
+    ExtensionServiceImpl.getInstance().getModelList().then(modelList => {
+      setState(prev => {
+        return {
+          ...prev,
+          modelList
+        }
+      })
+    })
+
   }, [])
 
   return (

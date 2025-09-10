@@ -9,6 +9,7 @@ export class ExtensionServiceInterface implements ExtensionService {
 
     private constructor() { }
 
+
     public static getInstance(): ExtensionServiceInterface {
         if (!this.instance) {
             this.instance = new ExtensionServiceInterface();
@@ -28,4 +29,9 @@ export class ExtensionServiceInterface implements ExtensionService {
     }> {
         return ModuleAppMessage.sendRequest(ExtensionServiceInterface.serviceName, "getEditorContext", {});
     }
+
+    async updateChatPromptTemplate({ promptTemplate }: { promptTemplate: string }): Promise<void> {
+        return ModuleAppMessage.sendRequest(ExtensionServiceInterface.serviceName, "updateChatPromptTemplate", { promptTemplate });
+    }
+
 }

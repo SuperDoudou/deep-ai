@@ -9,8 +9,6 @@ import { ExtensionMessageService } from '../../moduleService/extensionMessageSer
 export interface WebviewInitData {
 	modelList: ModelItem[]
 	promptTemplate: string
-	filePath: string
-	fileText: string
 }
 
 class ChatViewProvider implements vscode.WebviewViewProvider {
@@ -29,8 +27,6 @@ class ChatViewProvider implements vscode.WebviewViewProvider {
 
 	public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken,) {
 		let initData = VsCodeStorageService.GetChatWebviewInitData();
-		initData.filePath = vscode.window.activeTextEditor?.document.fileName || "";
-		initData.fileText = vscode.window.activeTextEditor?.document.getText() || "";
 
 		webviewView.webview.html = getWebviewContent(this.context, webviewView.webview);
 		webviewView.webview.options = {

@@ -1,10 +1,14 @@
 import { LLMService } from "../chat/app/chat/LLMService";
+import { ModelItem } from "../chat/app/GlobalStateProvider";
 import { ExtensionLLMService } from "../extension_handler/LLMService";
+import VsCodeStorageService from "../VsCodeStorageService";
 import { ExtensionService, Stream } from "./idl/extensionService";
 import { LLMStream } from "./idl/extensionServiceModel";
 
 
 export class ExtensionServiceImpl implements ExtensionService {
+
+
     public static instante: ExtensionServiceImpl;
     public static getInstance(): ExtensionServiceImpl {
         if (!this.instante) {
@@ -31,4 +35,17 @@ export class ExtensionServiceImpl implements ExtensionService {
             fileText: 'demo text'
         }
     }
+
+    async updateChatPromptTemplate({ promptTemplate }: { promptTemplate: string; }): Promise<void> {
+        VsCodeStorageService.setChatKey("promptTemplate", promptTemplate)
+        return
+    }
+
+    async getModelList(): Promise<ModelItem[]> {
+        return VsCodeStorageService.getModelList()
+    }
+    async setModelList({ modelList }: { modelList: ModelItem[]; }) {
+        return VsCodeStorageService.setModelList(modelList)
+    }
+
 }

@@ -2,6 +2,7 @@ import React, { forwardRef, useContext, useImperativeHandle, useState } from 're
 import { GlobalAppContext } from '../GlobalStateProvider';
 import VsCodeService from '../VsCodeService';
 import AppMessage from '../../../moduleService/ModuleAppMessage';
+import { ExtensionServiceInterface } from '../extensionServiceInterface';
 
 interface PromptConfigModalProps {
     onClose: () => void;
@@ -25,7 +26,7 @@ export const PromptConfigModal = forwardRef((props: PromptConfigModalProps, ref)
 
     const handleSave = () => {
         appContext.updateGlobalContext("promptTemplate", promptTemplate);
-        VsCodeService.updatePromptTemplate(promptTemplate);
+        ExtensionServiceInterface.getInstance().updateChatPromptTemplate({ promptTemplate });
         onClose();
     };
 

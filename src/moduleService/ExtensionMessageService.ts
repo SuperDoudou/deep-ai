@@ -1,8 +1,8 @@
 import { emit } from "process"
 import ChatViewProvider from "../chat/webview/ChatWebview"
-import { ExtensionServiceImpl } from "./extensionServiceImpl"
 import Stream, { ReqMessage, RespMessage } from "./idl/extensionService"
 import { isStreamMethod, LLMStream } from "./idl/extensionServiceModel";
+import { ExtensionServiceImpl } from "./ExtensionServiceImpl";
 
 class ReqMessageImpl implements ReqMessage {
     fromServiceName: string = "";

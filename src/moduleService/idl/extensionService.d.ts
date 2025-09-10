@@ -1,3 +1,5 @@
+import { ModelItem } from "../../chat/app/GlobalStateProvider"
+
 interface BaseMessage {
     fromServiceName: string
     toServiceName: string
@@ -31,4 +33,7 @@ export interface ExtensionService {
         filePath: string
         fileText: string
     }>
+    updateChatPromptTemplate: ({ }: { promptTemplate: string }) => Promise<void>
+    getModelList: () => Promise<ModelItem[]>
+    setModelList: ({ }: { modelList: ModelItem[] }) => Promise<void>
 }
