@@ -11,11 +11,13 @@ import VsCodeStorageService from './VsCodeStorageService';
 import { get } from 'node:http';
 import CompletionHandler from './extension_handler/Completion';
 import { ExtensionServiceImpl } from './moduleService/ExtensionServiceImpl';
+import CompletionHandler2 from './extension_handler/Completion2';
 
 var provider: ChatViewProvider;
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "my-vscode-extendsion" is now active!');
 	try {
+
 		registeStorage(context);
 		initConfig(context);
 		registeCodeLens(context);
@@ -82,8 +84,13 @@ function registeEvent(context: vscode.ExtensionContext) {
 		},
 	);
 	vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
-		CompletionHandler.handleCompletion(event);
-	});	// console.log(vscode.workspace.workspaceFolders);// 获得当前工作的workspace信息
+		CompletionHandler.handleCompletion(event.document.getText(), event.contentChanges[0].range);
+	});
+	// vscode.window.onDidChangeTextEditorSelection((event: vscode.TextEditorSelectionChangeEvent) => {
+	// 	CompletionHandler.handleCompletion(event.textEditor.document.getText(), event.selections[0]);
+	// });
+
+	// console.log(vscode.workspace.workspaceFolders);// 获得当前工作的workspace信息
 	// console.log(vscode.window.activeTextEditor?.document.uri.fsPath);// 获得当前打开的文档的路径
 	// console.log(vscode.window.activeTextEditor?.document.getText());// 获得当前打开的文档的内容
 }
@@ -117,8 +124,11 @@ function initConfig(context: vscode.ExtensionContext) {
 
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
 	// ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
-	ExtensionEnv.isProduction = false
+	ExtensionEnv.isProduction = false；;
 	ExtensionEnv.extensionPath = context.extensionPath;
+
+	context.subscriptions.push(CompletionHandler2.registerInlineComplete());
+
 }
 
 function registeStorage(context: vscode.ExtensionContext) {

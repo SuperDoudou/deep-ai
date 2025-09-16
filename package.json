@@ -10,7 +10,12 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:java",
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:golang"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "viewsContainers": {

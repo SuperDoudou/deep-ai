@@ -1,35 +1,40 @@
 import * as vscode from 'vscode';
 import { LLMService } from './LLMService';
+import * as diff from 'diff-match-patch';
 
 /**
  * 处理智能提示
  */
 class CompletionHandler {
-    public static async handleCompletion(event: vscode.TextDocumentChangeEvent) {
-        console.log("enter handleCompletion", event);
+    const static getSubText = (text: string, range: vscode.Range) => {
+        const startLine = Math.max(range.start.line - 10, 0);
+        const endLine = Math.min(range.end.line + 10, text.split('\n').length);
+        const lines = text.split('\n');
+        return lines.slice(startLine, endLine).join('\n');
+    }
+
+    public static async handleCompletion(text: string, range: vscode.Range) {
+        console.log("enter handleCompletion", text, range);
         let editor = vscode.window.activeTextEditor;
         if (!editor) {
             return;
         }
-        console.log("filter handleCompletion", event);
-        vscode.window.activeTextEditor?.selections;
-        let text = event.contentChanges[0].text;
-        let range = event.contentChanges[0].range;
-
-        let prompt = `请根据代码${text}，补全的代码，只返回补全的代码，不要返回其他内容`;
-
+        const subText = this.getSubText(text, range);
+        console.log("handle handleCompletion", text, subText);
+        let prompt = `用户正在编辑文件 ${text}，正在修改${subText}部分，请优化这部分，只返回补全的代码，不要返回其他内容`;
+        let totalAnswer = ""
 
         LLMService.chat(prompt, (reasoningContent, answer, isEnd) => {
             //
-            answer = "func main() {\n    fmt.Println(\"Hello, dou World!\")\n}"
-
+            // answer = "func main() {\n    fmt.Println(\"Hello, dou World!\")\n}"
+            totalAnswer += answer;
             if (isEnd) {
+                console.log("handleCompletion", totalAnswer);
                 let decorationType = vscode.window.createTextEditorDecorationType({
                     after: {
-                        contentIconPath: vscode.Uri.parse(textToBase64ImageSVG(answer, {
-                        })),
+                        contentIconPath: vscode.Uri.parse(textToBase64ImageSVG(subText, answer, {})),
                         margin: '0 0 0 10px',
-                        backgroundColor: "#ffffff",
+                        backgroundColor: "#333333",
                         width: '200px',
                         height: '100px',
                         textDecoration: `
@@ -46,7 +51,7 @@ class CompletionHandler {
                     overviewRulerColor: "#ffffff",
                     overviewRulerLane: vscode.OverviewRulerLane.Right,
 
-                    backgroundColor: "#ffffff",
+                    backgroundColor: "#333333",
                     opacity: "1",
                 });
                 editor.setDecorations(decorationType, [range]);
@@ -60,7 +65,8 @@ class CompletionHandler {
 
 
 export function textToBase64ImageSVG(
-    text: string,
+    oldText: string,
+    newText: string,
     options: {
         width?: number;
         height?: number;
@@ -79,39 +85,7 @@ export function textToBase64ImageSVG(
     } = options;
 
 
-    let lines = text.split('\n');
-
-
-    // 创建SVG
-    const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" >
-      <rect width="100%" 
-        height="100%" 
-        fill="${backgroundColor}" 
-        stroke="#ffffff" 
-        stroke-width="1" />
-
-      ${lines.map((line, index) => `
-        <rect 
-        x="${5 + fontSize / 2 * (line.match(/^\s*/)?.[0].length || 0)}"
-        y="${5 + (index + 1) * 20}" 
-        width="${line.length * fontSize / 2}" 
-        height="${fontSize}" 
-        fill="#333333" />
-
-        <text 
-        x="${5 + fontSize / 2 * (line.match(/^\s*/)?.[0].length || 0)}"
-        y="${5 + (index + 1) * 20}" 
-        font-family="${fontFamily}" 
-        font-size="${fontSize}" 
-        fill="${color}" 
-        text-anchor="start" 
-        dominant-baseline="center"
-      >
-        ${line}
-      </text>`)}
-    </svg>
-  `;
+    const svg = genSvg(oldText, newText);
     console.log("svg", svg);
 
     // 转换为Base64
@@ -124,13 +98,71 @@ export function textToBase64ImageSVG(
     }
 }
 
-// 使用示例
-const base64Image = textToBase64ImageSVG('TypeScript Rocks!', {
-    fontSize: 20,
-    color: '#3366ff',
-    backgroundColor: '#f8f8f8'
-});
-console.log(base64Image);
+function htmlEscape(text: string): string {
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+function genSvg(original: string, modified: string): string {
+    original = `<div class="svg-container">
+            <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+                <!-- 主标题 -->
+                <text class="text" x="400" y="50" text-anchor="middle" font-size="32" font-weight="bold">`
+    modified = `<div class="svg1-container">
+            <svg viewBox="0 0 800 300" xmlns="http://www.w3.333org/2000/svg">
+                <!-- 主标题 -->
+                <text class="text" x="400" y="50" text-anchor="mid88899dle" font-size="32" font-weight="bold">`
+    // 计算original的缩进符号
+
+
+    const dmp = new diff.diff_match_patch();
+    let diffs = dmp.diff_main(original, modified);
+    dmp.diff_cleanupSemantic(diffs);
+    // dmp.diff_cleanupSemantic(diffs);
+    let svgString: string = "";
+    let lineStart = true;
+    let lineNum = 0;
+
+    for (let i = 0; i < diffs.length; i++) {
+        let part = diffs[i];
+        let type = part[0];
+        let text = htmlEscape(part[1]);
+        let beforeText = i > 0 ? htmlEscape(diffs[i - 1][1]) : ""
+        if (beforeText.endsWith("\n")) {
+            lineStart = true;
+        }
+
+        let texts = text.split("\n");
+        for (let j = 0; j < texts.length; j++) {
+            if (j > 0) {
+                lineStart = true;
+            }
+            if (lineStart) {
+                if (svgString.length > 0) {
+                    svgString += `</text>`;
+                }
+
+                svgString += `<text fill="white" class="text" font-size="10" x="0" y="${10 + lineNum * 25}">`;
+                lineNum++;
+                lineStart = false;
+            }
+            if (type === diff.DIFF_EQUAL) {
+                svgString += texts[j]
+                continue;
+            }
+            if (type === diff.DIFF_INSERT) {
+                svgString += `<tspan fill="green">${texts[j]}</tspan>`;
+
+            }
+        }
+    }
+    svgString += `</text>`;
+    svgString = `<svg width="800" height="200" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="800" height="200"style="fill:#333333;"/>` + svgString + `</svg>`
+    return svgString;
+}
 
 
 export function showInlinePopup() {
@@ -173,3 +205,4 @@ export function showInlinePopup() {
 }
 
 export default CompletionHandler;
+
