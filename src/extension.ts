@@ -124,7 +124,7 @@ function initConfig(context: vscode.ExtensionContext) {
 
 	vscode.workspace.getConfiguration().update("diffEditor.codeLens", true, false);
 	// ExtensionEnv.isProduction = context.extensionMode === vscode.ExtensionMode.Production;
-	ExtensionEnv.isProduction = false；;
+	ExtensionEnv.isProduction = false;
 	ExtensionEnv.extensionPath = context.extensionPath;
 
 	context.subscriptions.push(CompletionHandler2.registerInlineComplete());

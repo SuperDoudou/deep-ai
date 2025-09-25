@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { LLMService } from './LLMService';
 import * as diff from 'diff-match-patch';
+import { Base64 } from 'js-base64';
 
 /**
  * 处理智能提示
@@ -29,15 +30,16 @@ class CompletionHandler {
             // answer = "func main() {\n    fmt.Println(\"Hello, dou World!\")\n}"
             totalAnswer += answer;
             if (isEnd) {
-                console.log("handleCompletion", totalAnswer);
-                let decorationType = vscode.window.createTextEditorDecorationType({
-                    after: {
-                        contentIconPath: vscode.Uri.parse(textToBase64ImageSVG(subText, answer, {})),
-                        margin: '0 0 0 10px',
-                        backgroundColor: "#333333",
-                        width: '200px',
-                        height: '100px',
-                        textDecoration: `
+                textToBase64ImageSVG(subText, answer, {}).then(base64Image => {
+                    console.log("handleCompletion", totalAnswer);
+                    let decorationType = vscode.window.createTextEditorDecorationType({
+                        before: {
+                            contentIconPath: vscode.Uri.parse(base64Image),
+                            margin: '0 0 0 10px',
+                            backgroundColor: "#333333",
+                            width: '200px',
+                            height: '100px',
+                            textDecoration: `
                                     none;
                                     position: absolute;
                                     left: -0.5rem;
@@ -46,15 +48,17 @@ class CompletionHandler {
                                     pointer-events: none;
                                     background-size: 100% 100%;
                                     background-repeat: no-repeat; `
-                    },
-                    rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
-                    overviewRulerColor: "#ffffff",
-                    overviewRulerLane: vscode.OverviewRulerLane.Right,
+                        },
+                        rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
+                        overviewRulerColor: "#ffffff",
+                        overviewRulerLane: vscode.OverviewRulerLane.Right,
 
-                    backgroundColor: "#333333",
-                    opacity: "1",
-                });
-                editor.setDecorations(decorationType, [range]);
+                        backgroundColor: "#333333",
+                        opacity: "0.3",
+                    });
+                    editor.setDecorations(decorationType, [range]);
+                })
+
                 // editor.edit(editBuilder => {
                 //     editBuilder.replace(wordRange, answer);
                 // });
@@ -63,8 +67,7 @@ class CompletionHandler {
     }
 }
 
-
-export function textToBase64ImageSVG(
+export async function textToBase64ImageSVG(
     oldText: string,
     newText: string,
     options: {
@@ -75,7 +78,7 @@ export function textToBase64ImageSVG(
         color?: string;
         backgroundColor?: string;
     } = {}
-): string {
+): Promise<string> {
     // 默认配置
     const {
         fontSize = 16,
@@ -83,19 +86,26 @@ export function textToBase64ImageSVG(
         color = '#aaaaaa',
         backgroundColor = '#222222'
     } = options;
-
-
-    const svg = genSvg(oldText, newText);
-    console.log("svg", svg);
-
-    // 转换为Base64
-    if (typeof window !== 'undefined') {
-        // 浏览器环境
-        return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
-    } else {
-        // Node.js环境
-        return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+    const base64OldText = Base64.encode(oldText);
+    const base64NewText = Base64.encode(newText);
+    const response = await fetch('http://deep-app.top:8095/code2Image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "newCode": base64OldText,
+            "oldCode": base64NewText
+        })
+    }).catch(err => {
+        console.log("code2Image err", err);
+    });
+    if (!response) {
+        return "";
     }
+    const text = await response.text();
+    console.log("code2Image", text);
+    return text;
 }
 
 function htmlEscape(text: string): string {
@@ -113,11 +123,17 @@ function genSvg(original: string, modified: string): string {
                 <text class="text" x="400" y="50" text-anchor="middle" font-size="32" font-weight="bold">`
     modified = `<div class="svg1-container">
             <svg viewBox="0 0 800 300" xmlns="http://www.w3.333org/2000/svg">
+
                 <!-- 主标题 -->
-                <text class="text" x="400" y="50" text-anchor="mid88899dle" font-size="32" font-weight="bold">`
+
+                <text class="text" x="400" y="50" text-anchor="mid888
+                
+                99dle" font-size="32" font-weight="bold">`
     // 计算original的缩进符号
 
-
+    const fontSize = 14
+    const lineHeight = fontSize * 1.7
+    const textOffset = 5
     const dmp = new diff.diff_match_patch();
     let diffs = dmp.diff_main(original, modified);
     dmp.diff_cleanupSemantic(diffs);
@@ -145,7 +161,7 @@ function genSvg(original: string, modified: string): string {
                     svgString += `</text>`;
                 }
 
-                svgString += `<text fill="white" class="text" font-size="10" x="0" y="${10 + lineNum * 25}">`;
+                svgString += `<text fill="#cccccc" class="text" font-size="${fontSize}" x="${textOffset}" y="${fontSize * 1.3 + lineNum * lineHeight}">`;
                 lineNum++;
                 lineStart = false;
             }
@@ -160,7 +176,7 @@ function genSvg(original: string, modified: string): string {
         }
     }
     svgString += `</text>`;
-    svgString = `<svg width="800" height="200" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="800" height="200"style="fill:#333333;"/>` + svgString + `</svg>`
+    svgString = `<svg width="800" height="${lineNum * lineHeight}" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="800" height="${lineNum * lineHeight}" style="fill:#333333;"/>` + svgString + `</svg>`
     return svgString;
 }
 
@@ -184,7 +200,7 @@ export function showInlinePopup() {
             backgroundColor: 'rgba(200, 200, 200, 0.3)',
             border: '1px solid',
             borderColor: 'rgba(200, 200, 200, 0.7)',
-            borderRadius: '4px', sdf
+            borderRadius: '4px',
             margin: '0 0 0 10px',
             padding: '2px 5px'
         },
